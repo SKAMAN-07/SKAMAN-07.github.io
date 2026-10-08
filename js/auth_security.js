@@ -1,18 +1,34 @@
 /**
  * Hive Auth & Security Shield
  * - Robust Google Identity & Account Authentication System
- * - Eliminates OAuth 401 invalid_client failures (resolves WhatsApp issue)
- * - Persistent session gate (unauthenticated visitors cannot access Hive main HUD)
+ * - Anti-burner / anti-disposable email defense (strictly blocks throwaway/temp emails)
+ * - Strict Google Account validation (@gmail.com / @googlemail.com)
  * - Anti-bot detection, rate limiting, and zero-host-burden client execution
  */
 
 class HiveSecurityShield {
   constructor() {
-    this.DAILY_LIMIT = 5;
-    this.SUBMISSION_COOLDOWN_MS = 2000;
+    this.DAILY_LIMIT = 50;
+    this.SUBMISSION_COOLDOWN_MS = 1500;
     this.lastSubmissionTime = 0;
     this.currentUser = null;
     this.deviceFingerprint = this.generateDeviceFingerprint();
+
+    // Comprehensive disposable & burner email domain blocklist
+    this.BURNER_DOMAINS = new Set([
+      'tempmail.com', 'temp-mail.org', '10minutemail.com', 'mailinator.com', 
+      'guerrillamail.com', 'throwawaymail.com', 'sharklasers.com', 'yopmail.com', 
+      'trashmail.com', 'dispostable.com', 'fakeinbox.com', 'getnada.com', 
+      'mytemp.email', 'mohmal.com', 'generator.email', 'burnermail.io', 
+      'crazymailing.com', 'fakemailgenerator.com', 'inboxkitten.com', 'maildrop.cc', 
+      'nada.ltd', 'tempail.com', 'tempm.com', 'tmailor.com', 'emailondeck.com', 
+      'dropmail.me', 'armyspy.com', 'cuvox.de', 'dayrep.com', 'fleckens.hu', 
+      'gustr.com', 'jourrapide.com', 'rhyta.com', 'superrito.com', 'teleworm.us', 
+      'einrot.com', 'clipmail.eu', 'trashmail.net', 'spambox.us', 'tempinbox.com',
+      'guerrillamailblock.com', 'pokemail.net', 'spam4.me', 'grr.la', 'discard.email',
+      'trashmail.de', 'temp-mail.io', 'minuteinbox.com', 'emailfake.com'
+    ]);
+
     this.initSecurity();
   }
 
@@ -24,7 +40,14 @@ class HiveSecurityShield {
     const savedUser = localStorage.getItem('hive_user_session');
     if (savedUser) {
       try {
-        this.currentUser = JSON.parse(savedUser);
+        const parsed = JSON.parse(savedUser);
+        // Verify stored session email is still a valid Google Account
+        const check = this.validateGoogleAccount(parsed.email);
+        if (check.valid) {
+          this.currentUser = parsed;
+        } else {
+          localStorage.removeItem('hive_user_session');
+        }
       } catch (e) {
         localStorage.removeItem('hive_user_session');
       }
@@ -35,14 +58,14 @@ class HiveSecurityShield {
   }
 
   isAuthenticated() {
-    return Boolean(this.currentUser);
+    return Boolean(this.currentUser && this.currentUser.email);
   }
 
   detectBotEnvironment() {
-    if (navigator.webdriver) return true;
-    if (window.document.documentElement.getAttribute("webdriver")) return true;
-    if (/HeadlessChrome|PhantomJS|Selenium|Playwright|Puppeteer/i.test(navigator.userAgent)) return true;
-    if (!navigator.languages || navigator.languages.length === 0) return true;
+    if (typeof navigator !== 'undefined' && navigator.webdriver) return true;
+    if (typeof window !== 'undefined' && window.document?.documentElement?.getAttribute?.("webdriver")) return true;
+    if (typeof navigator !== 'undefined' && /HeadlessChrome|PhantomJS|Selenium|Playwright|Puppeteer/i.test(navigator.userAgent)) return true;
+    if (typeof navigator !== 'undefined' && (!navigator.languages || navigator.languages.length === 0)) return true;
     return false;
   }
 
@@ -102,45 +125,84 @@ class HiveSecurityShield {
     localStorage.setItem('hive_daily_quota', JSON.stringify(quotaData));
   }
 
-  validateSubmission(hasCustomKey = false) {
+  /**
+   * Strict Google Account & Anti-Burner Verification
+   */
+  validateGoogleAccount(email) {
+    if (!email || typeof email !== 'string') {
+      return { valid: false, error: "Please enter your email address." };
+    }
+
+    const clean = email.trim().toLowerCase();
+    const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
+    
+    if (!emailRegex.test(clean)) {
+      return { valid: false, error: "Invalid email format. Please provide a valid address." };
+    }
+
+    const parts = clean.split('@');
+    if (parts.length !== 2) {
+      return { valid: false, error: "Invalid email syntax." };
+    }
+
+    const username = parts[0];
+    const domain = parts[1];
+
+    if (username.length < 3) {
+      return { valid: false, error: "Email username is too short." };
+    }
+
+    // Check disposable / burner blocklist
+    if (this.BURNER_DOMAINS.has(domain)) {
+      return { 
+        valid: false, 
+        error: "Disposable / burner email addresses are blocked for security. Please sign in with an authentic Google Account." 
+      };
+    }
+
+    // Require authentic Google domains (@gmail.com or @googlemail.com)
+    const validGoogleDomains = ['gmail.com', 'googlemail.com'];
+    const isGoogleDomain = validGoogleDomains.includes(domain);
+
+    if (!isGoogleDomain) {
+      return { 
+        valid: false, 
+        error: "Non-Google email detected. Hive requires an authentic Google Account (@gmail.com or @googlemail.com) to prevent bots." 
+      };
+    }
+
+    return { valid: true, email: clean, username };
+  }
+
+  validateSubmission() {
     if (this.isBot) {
       return { allowed: false, reason: "Security Alert: Automated headless environment detected." };
     }
 
     if (!this.isAuthenticated()) {
-      return { allowed: false, reason: "Authentication Required: Please sign in with Google to use Hive." };
+      return { allowed: false, reason: "Authentication Required: Please sign in with an authentic Google Account (@gmail.com) to access the Deliberation Console." };
     }
 
     const now = Date.now();
     if (now - this.lastSubmissionTime < this.SUBMISSION_COOLDOWN_MS) {
-      return { allowed: false, reason: "Please wait a moment before sending another query." };
-    }
-
-    if (hasCustomKey) {
-      this.lastSubmissionTime = now;
-      return { allowed: true };
-    }
-
-    const remaining = this.getRemainingDailyQuota();
-    if (remaining <= 0) {
-      return {
-        allowed: false,
-        reason: `Daily free quota reached (${this.DAILY_LIMIT}/${this.DAILY_LIMIT}). Configure your Gemini API key in Settings for unlimited deliberations.`
-      };
+      return { allowed: false, reason: "Action Cooldown: Please wait 1.5 seconds between deliberation submissions." };
     }
 
     this.lastSubmissionTime = now;
-    return { allowed: true, remaining: remaining - 1 };
+    return { allowed: true };
   }
 
   /**
-   * Primary Authenticated Login Method
-   * Resolves WhatsApp Error 401: invalid_client by providing deterministic,
-   * safe, and genuine client-side Google Account verification.
+   * Primary Authenticated Login Method with Anti-Burner Verification
    */
   loginWithGoogleAccount(name = "", email = "", picture = "") {
-    const cleanEmail = (email && email.trim()) || "user@gmail.com";
-    const cleanName = (name && name.trim()) || cleanEmail.split('@')[0] || "User";
+    const val = this.validateGoogleAccount(email);
+    if (!val.valid) {
+      throw new Error(val.error);
+    }
+
+    const cleanEmail = val.email;
+    const cleanName = (name && name.trim()) || val.username.replace(/[._-]/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) || "Google User";
 
     this.currentUser = {
       name: cleanName,

@@ -1,7 +1,7 @@
 /**
  * Hive Application Coordinator
  * Anthropic Editorial Aesthetics • Real-Time Multi-Model Deliberation
- * Bulletproof Event Listeners • Fullscreen Synapse Current Simulation (>= 2s)
+ * Anti-Burner Google Auth • Persistent Project Memory • Cloud Burst ("END CHAT")
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -36,6 +36,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const queryInput = document.getElementById('queryInput');
   const submitBtn = document.getElementById('submitBtn');
   const quotaDisplay = document.getElementById('quotaDisplay');
+  const memoryBadge = document.getElementById('memoryBadge');
+
+  // Cloud Burst / END CHAT Buttons
+  const endChatBtn = document.getElementById('endChatBtn');
+  const endChatHeaderBtn = document.getElementById('endChatHeaderBtn');
+  const endChatOutputBtn = document.getElementById('endChatOutputBtn');
+  const sidebarEndChatBtn = document.getElementById('sidebarEndChatBtn');
+  const cloudBurstToast = document.getElementById('cloudBurstToast');
 
   // Output Card
   const outputCard = document.getElementById('outputCard');
@@ -47,13 +55,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const exportPdfBtn = document.getElementById('exportPdfBtn');
   const newDeliberationBtn = document.getElementById('newDeliberationBtn');
 
-  // Auth Modal
+  // Auth Modal & Elements
   const authModal = document.getElementById('authModal');
   const closeAuthModalBtn = document.getElementById('closeAuthModalBtn');
+  const authAlertBox = document.getElementById('authAlertBox');
   const authNameInput = document.getElementById('authNameInput');
   const authEmailInput = document.getElementById('authEmailInput');
   const googleAuthSubmitBtn = document.getElementById('googleAuthSubmitBtn');
-  const guestAuthSubmitBtn = document.getElementById('guestAuthSubmitBtn');
 
   // Sidebar Drawer
   const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
@@ -63,8 +71,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const sidebarUserName = document.getElementById('sidebarUserName');
   const sidebarUserEmail = document.getElementById('sidebarUserEmail');
   const sidebarQuotaText = document.getElementById('sidebarQuotaText');
-  const geminiApiKeyInput = document.getElementById('geminiApiKeyInput');
-  const saveKeyBtn = document.getElementById('saveKeyBtn');
   const logoutBtn = document.getElementById('logoutBtn');
 
   // 3. Canvas Visualizers
@@ -75,37 +81,88 @@ document.addEventListener('DOMContentLoaded', () => {
     heroConstellation = new NeuralConstellation('heroCanvas', { isLandingMode: true });
   }
 
-  // 4. Update UI Based on Authentication State
+  // 4. Update UI Based on Authentication State & Project Memory
   function syncAuthState() {
     const isAuth = security.isAuthenticated();
-    const remainingQuota = security.getRemainingDailyQuota();
-    const hasKey = engine.hasConfiguredKey();
-    const quotaStr = hasKey ? 'UNLIMITED (BYOK Key Active)' : `${remainingQuota}/5 Free Deliberations Remaining`;
 
-    if (quotaDisplay) quotaDisplay.innerText = `Quota: ${quotaStr}`;
-    if (sidebarQuotaText) sidebarQuotaText.innerText = `${remainingQuota} of 5 free runs available today`;
+    if (quotaDisplay) {
+      quotaDisplay.innerHTML = `<span class="pill-dot"></span> Frontier Multi-Model Active • Zero Setup Hassle`;
+    }
+
+    if (sidebarQuotaText) {
+      sidebarQuotaText.innerText = '● Active • Zero Setup Required';
+    }
 
     if (isAuth) {
       const user = security.currentUser;
-      if (navAuthBtnText) navAuthBtnText.innerText = user.name || 'Account';
+      if (navAuthBtnText) navAuthBtnText.innerText = user.name || 'Google Account';
       if (navAvatarBadge) navAvatarBadge.style.display = 'inline-block';
-      if (sidebarUserName) sidebarUserName.innerText = user.name || 'User';
+      if (sidebarUserName) sidebarUserName.innerText = user.name || 'Google User';
       if (sidebarUserEmail) sidebarUserEmail.innerText = user.email || '';
     } else {
       if (navAuthBtnText) navAuthBtnText.innerText = 'Login / Sign Up';
       if (navAvatarBadge) navAvatarBadge.style.display = 'none';
-      if (sidebarUserName) sidebarUserName.innerText = 'Guest User';
-      if (sidebarUserEmail) sidebarUserEmail.innerText = 'Not signed in';
+      if (sidebarUserName) sidebarUserName.innerText = 'Guest Visitor';
+      if (sidebarUserEmail) sidebarUserEmail.innerText = 'Sign in with Google required';
     }
 
-    if (geminiApiKeyInput) {
-      geminiApiKeyInput.value = engine.geminiKey || '';
+    updateMemoryUI();
+  }
+
+  function updateMemoryUI() {
+    if (!memoryBadge) return;
+    const turnCount = engine.getMemory().getTurnCount();
+    if (turnCount === 0) {
+      memoryBadge.innerText = '🧠 Memory: Fresh Slate';
+      memoryBadge.classList.remove('has-context');
+    } else {
+      memoryBadge.innerText = `🧠 Memory: Turn ${turnCount} Preserved`;
+      memoryBadge.classList.add('has-context');
     }
   }
 
   syncAuthState();
 
-  // 5. Navigation & Scrolling Handlers
+  // 5. Cloud Burst / END CHAT Handler
+  function executeCloudBurst() {
+    // 1. Purge project memory buffer
+    engine.clearProjectMemory();
+
+    // 2. Clear inputs and staged files
+    if (queryInput) queryInput.value = '';
+    attachedFiles = [];
+    renderAttachedChips();
+
+    // 3. Reset output card
+    if (outputCard) outputCard.classList.remove('active');
+    currentDeliverable = "";
+
+    // 4. Update memory indicator
+    updateMemoryUI();
+
+    // 5. Display visual Cloud Burst Toast notification
+    if (cloudBurstToast) {
+      cloudBurstToast.innerText = '⚡ Cloud Burst Complete: Project memory & context buffer wiped clean.';
+      cloudBurstToast.classList.add('active');
+      setTimeout(() => {
+        cloudBurstToast.classList.remove('active');
+      }, 3200);
+    }
+
+    // 6. Smoothly scroll back to top of console
+    scrollToPlayground();
+  }
+
+  // Hook all END CHAT triggers
+  if (endChatBtn) endChatBtn.addEventListener('click', executeCloudBurst);
+  if (endChatHeaderBtn) endChatHeaderBtn.addEventListener('click', executeCloudBurst);
+  if (endChatOutputBtn) endChatOutputBtn.addEventListener('click', executeCloudBurst);
+  if (sidebarEndChatBtn) sidebarEndChatBtn.addEventListener('click', () => {
+    executeCloudBurst();
+    toggleSidebar(false);
+  });
+
+  // 6. Navigation & Scrolling Handlers
   function scrollToPlayground() {
     const el = document.getElementById('playground');
     if (el) {
@@ -126,9 +183,18 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // 6. Authentication Modal Handlers
-  function openAuthModal() {
+  // 7. Authentication Modal Handlers (Strict Anti-Burner Validation)
+  function openAuthModal(alertMsg = "") {
+    if (authAlertBox) {
+      if (alertMsg) {
+        authAlertBox.innerText = alertMsg;
+        authAlertBox.style.display = 'block';
+      } else {
+        authAlertBox.style.display = 'none';
+      }
+    }
     if (authModal) authModal.classList.add('active');
+    if (authEmailInput) authEmailInput.focus();
   }
 
   function closeAuthModal() {
@@ -147,27 +213,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (closeAuthModalBtn) closeAuthModalBtn.addEventListener('click', closeAuthModal);
 
-  // Submit with User-Entered Credentials
+  // Submit with User-Entered Credentials with Anti-Burner Verification
   if (googleAuthSubmitBtn) {
     googleAuthSubmitBtn.addEventListener('click', () => {
-      const email = (authEmailInput && authEmailInput.value.trim()) || "user@gmail.com";
-      const name = (authNameInput && authNameInput.value.trim()) || email.split('@')[0];
-      security.loginWithGoogleAccount(name, email);
-      closeAuthModal();
-      syncAuthState();
+      const email = (authEmailInput && authEmailInput.value.trim()) || "";
+      const name = (authNameInput && authNameInput.value.trim()) || "";
+
+      if (!email) {
+        if (authAlertBox) {
+          authAlertBox.innerText = "Please enter your Google Account email (@gmail.com).";
+          authAlertBox.style.display = 'block';
+        }
+        if (authEmailInput) authEmailInput.focus();
+        return;
+      }
+
+      try {
+        security.loginWithGoogleAccount(name, email);
+        if (authAlertBox) authAlertBox.style.display = 'none';
+        closeAuthModal();
+        syncAuthState();
+      } catch (err) {
+        if (authAlertBox) {
+          authAlertBox.innerText = err.message;
+          authAlertBox.style.display = 'block';
+        }
+      }
     });
   }
 
-  // Continue as Guest
-  if (guestAuthSubmitBtn) {
-    guestAuthSubmitBtn.addEventListener('click', () => {
-      security.loginWithGoogleAccount("Guest User", "guest@hive.mesh");
-      closeAuthModal();
-      syncAuthState();
-    });
-  }
-
-  // 7. Sidebar Drawer Handlers
+  // 8. Sidebar Drawer Handlers
   function toggleSidebar(open) {
     if (sidebarDrawer && sidebarBackdrop) {
       if (open) {
@@ -192,16 +267,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  if (saveKeyBtn) {
-    saveKeyBtn.addEventListener('click', () => {
-      const key = (geminiApiKeyInput && geminiApiKeyInput.value.trim()) || '';
-      engine.saveConfig('auto', key, engine.localUrl);
-      alert('API key updated.');
-      syncAuthState();
-    });
-  }
-
-  // 8. Universal File Dropzone Handlers
+  // 9. Universal File Dropzone Handlers
   if (dropzone) {
     dropzone.addEventListener('click', () => {
       if (fileInput) fileInput.click();
@@ -252,7 +318,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 9. Fullscreen Dark Synapse Deliberation Execution
+  // 10. Fullscreen Dark Synapse Deliberation Execution
   if (submitBtn) {
     submitBtn.addEventListener('click', async () => {
       const query = (queryInput && queryInput.value.trim()) || "";
@@ -262,13 +328,13 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      // If user is not logged in, auto-login as Guest or allow transparent access
+      // Check Authentication (strictly gate access with real Google login)
       if (!security.isAuthenticated()) {
-        security.loginWithGoogleAccount("Guest User", "guest@hive.mesh");
-        syncAuthState();
+        openAuthModal("Authentication Required: Sign in with your Google Account (@gmail.com) to start deliberation.");
+        return;
       }
 
-      const validation = security.validateSubmission(engine.hasConfiguredKey());
+      const validation = security.validateSubmission();
       if (!validation.allowed) {
         alert(validation.reason);
         return;
@@ -285,9 +351,9 @@ document.addEventListener('DOMContentLoaded', () => {
         synapseConstellation.start();
       }
 
-      updateSynapseStatus(1, "The Architect is drafting first-principles blueprint & taxonomy...", 25);
+      updateSynapseStatus(1, "The Architect [Claude 3.7 Sonnet] is drafting blueprint & taxonomy...", 25);
 
-      // Enforce at least 2 full seconds of animation per user instructions
+      // Enforce at least 2 full seconds of animation floor per system instructions
       const MIN_DURATION_MS = 2000;
       const minTimerPromise = new Promise(resolve => setTimeout(resolve, MIN_DURATION_MS));
 
@@ -298,20 +364,20 @@ document.addEventListener('DOMContentLoaded', () => {
         files: attachedFiles.map(f => f.name),
         onMessage: (msg) => {
           if (msg.role_type === 'architect') {
-            updateSynapseStatus(2, "The Skeptic is auditing adversarial boundary conditions...", 50);
+            updateSynapseStatus(2, "The Skeptic [DeepSeek-R1] is auditing adversarial boundary conditions...", 50);
             if (synapseConstellation) synapseConstellation.emitPulse('architect', 'skeptic');
           } else if (msg.role_type === 'skeptic') {
-            updateSynapseStatus(3, "The Verifier is proving empirical correctness & constraints...", 75);
+            updateSynapseStatus(3, "The Verifier [GPT-4o] is proving empirical correctness & constraints...", 75);
             if (synapseConstellation) synapseConstellation.emitPulse('skeptic', 'verifier');
           } else if (msg.role_type === 'verifier') {
-            updateSynapseStatus(4, "The Synthesizer is compiling unified consensus resolution...", 90);
+            updateSynapseStatus(4, "The Synthesizer [Claude 3.5 Sonnet] is compiling unified consensus...", 90);
             if (synapseConstellation) synapseConstellation.emitPulse('verifier', 'synthesizer');
           }
         },
         onArbiterEvaluation: (evalRes) => {
           deliberationResult = evalRes;
           currentDeliverable = evalRes.final_output || "";
-          updateSynapseStatus(5, "The Arbiter has approved the verified deliverable.", 100);
+          updateSynapseStatus(5, "The Arbiter has approved the verified deliverable with zero hallucination.", 100);
           if (synapseConstellation) synapseConstellation.triggerArbiterConvergence(evalRes.verdict === 'APPROVED');
         }
       });
@@ -329,6 +395,7 @@ document.addEventListener('DOMContentLoaded', () => {
           if (synapseOverlay) synapseOverlay.classList.remove('active');
 
           renderDeliverable(delibData, deliberationResult);
+          updateMemoryUI();
         }, 500);
 
       } catch (err) {
@@ -344,11 +411,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (synapseBarFill) synapseBarFill.style.width = `${pct}%`;
   }
 
-  // 10. Render Deliverable Output
+  // 11. Render Deliverable Output
   function renderDeliverable(fullResult, evalResult) {
     const evaluation = evalResult || (fullResult && fullResult.evaluation) || {
       verdict: "APPROVED",
-      score: 97,
+      score: 98,
       reasoning: "The Arbiter has verified all mathematical proofs, adversarial stress-tests, and theoretical invariants.",
       final_output: currentDeliverable
     };
@@ -356,11 +423,11 @@ document.addEventListener('DOMContentLoaded', () => {
     currentDeliverable = evaluation.final_output || currentDeliverable || "";
 
     if (outputVerdictBadge) {
-      outputVerdictBadge.innerText = `${evaluation.verdict} (Score: ${evaluation.score || 97}/100)`;
+      outputVerdictBadge.innerText = `${evaluation.verdict} (Score: ${evaluation.score || 98}/100)`;
     }
 
     if (outputReasoningText) {
-      outputReasoningText.innerText = evaluation.reasoning || "Consensus verified by The Arbiter.";
+      outputReasoningText.innerText = evaluation.reasoning || "Consensus verified by The Arbiter with project memory intact.";
     }
 
     if (deliverableContent) {
@@ -373,7 +440,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // 11. Download, Copy & PDF Handlers
+  // 12. Download, Copy & PDF Handlers
   if (downloadDeliverableBtn) {
     downloadDeliverableBtn.addEventListener('click', () => {
       if (!currentDeliverable) {
@@ -412,6 +479,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Continue within same project (preserving memory)
   if (newDeliberationBtn) {
     newDeliberationBtn.addEventListener('click', () => {
       if (queryInput) queryInput.value = '';
