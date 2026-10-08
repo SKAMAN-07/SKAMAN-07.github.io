@@ -194,9 +194,9 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 32px;
+  padding: 16px 28px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  background: rgba(7, 10, 19, 0.6);
+  background: rgba(7, 10, 19, 0.65);
   backdrop-filter: blur(12px);
 }
 
@@ -220,6 +220,11 @@ body {
   -webkit-text-fill-color: transparent;
 }
 
+.google-logo-sm {
+  margin-right: 4px;
+  vertical-align: middle;
+}
+
 .carousel-viewport {
   position: relative;
   z-index: 10;
@@ -233,160 +238,130 @@ body {
 .carousel-track {
   display: flex;
   width: 100%;
-  transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 1.25s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .carousel-slide {
   flex: 0 0 100%;
   width: 100%;
-  min-height: calc(100vh - 140px);
+  min-height: calc(100vh - 120px);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 40px 20px 80px 20px;
+  padding: 24px 16px 70px 16px;
 }
 
-.slide-content {
-  max-width: 820px;
+.slide-inner {
+  max-width: 1040px;
   width: 100%;
-  text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 18px;
 }
 
-.hero-badge {
-  display: inline-block;
-  font-family: "JetBrains Mono", monospace;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  color: var(--cyan-glow);
-  background: rgba(6, 182, 212, 0.1);
-  border: 1px solid rgba(6, 182, 212, 0.3);
-  padding: 5px 14px;
-  border-radius: 999px;
-  margin-bottom: 24px;
-  text-transform: uppercase;
-}
-
-.hero-svg-container {
+/* 16:9 Canva Presentation Slide Frame */
+.slide-canva-frame {
+  position: relative;
   width: 100%;
-  max-width: 540px;
-  margin-bottom: 24px;
-  filter: drop-shadow(0 0 35px rgba(6, 182, 212, 0.25));
-  animation: floatingHero 6s ease-in-out infinite;
+  max-width: 960px;
+  aspect-ratio: 1024.5 / 576;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(6, 182, 212, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: #020408;
+  animation: anthropicFloat 6s ease-in-out infinite;
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
-@keyframes floatingHero {
+.slide-canva-frame:hover {
+  box-shadow: 0 28px 75px rgba(0, 0, 0, 0.9), 0 0 50px rgba(6, 182, 212, 0.28);
+  border-color: rgba(34, 211, 238, 0.35);
+}
+
+@keyframes anthropicFloat {
   0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
+  50% { transform: translateY(-6px); }
 }
 
-.hero-canva-svg {
+.canva-slide-img {
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: contain;
   display: block;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
-.hero-title, .slide-title {
-  font-size: 40px;
-  font-weight: 800;
-  line-height: 1.2;
-  letter-spacing: -1px;
-  color: #ffffff;
-  margin-bottom: 16px;
+/* Interactive Hotspot overlaid directly onto Canva Slide 3's Google Button */
+.canva-google-hotspot {
+  position: absolute;
+  left: 29.8%;
+  top: 46.3%;
+  width: 40.2%;
+  height: 21.5%;
+  border-radius: 999px;
+  background: rgba(6, 182, 212, 0.04);
+  border: 2px solid rgba(34, 211, 238, 0.7);
+  box-shadow: 0 0 25px rgba(6, 182, 212, 0.5), inset 0 0 15px rgba(6, 182, 212, 0.25);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s ease;
+  z-index: 25;
+  outline: none;
 }
 
-.hero-description, .slide-subtitle {
-  font-size: 16px;
-  color: var(--text-muted);
-  max-width: 640px;
-  line-height: 1.6;
-  margin-bottom: 32px;
+.canva-google-hotspot:hover {
+  background: rgba(6, 182, 212, 0.15);
+  border-color: #38bdf8;
+  box-shadow: 0 0 40px rgba(56, 189, 248, 0.85), inset 0 0 20px rgba(56, 189, 248, 0.5);
+  transform: scale(1.02);
 }
 
-.hero-actions {
+.canva-google-hotspot:active {
+  transform: scale(0.98);
+}
+
+.canva-google-hotspot .hotspot-pulse {
+  position: absolute;
+  inset: -6px;
+  border-radius: 999px;
+  border: 2px solid rgba(34, 211, 238, 0.7);
+  animation: hotspotPulse 2.2s infinite;
+  pointer-events: none;
+}
+
+@keyframes hotspotPulse {
+  0% { transform: scale(0.97); opacity: 1; }
+  100% { transform: scale(1.08); opacity: 0; }
+}
+
+/* Slide Controls & Action Bars */
+.slide-controls-bar {
   display: flex;
   gap: 14px;
   justify-content: center;
+  align-items: center;
   flex-wrap: wrap;
 }
 
-/* Slide 2: Council Mechanics Grid */
-.roles-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 16px;
-  width: 100%;
-  margin-bottom: 32px;
-  text-align: left;
-}
-
-.role-card {
-  background: var(--surface-card);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  padding: 20px;
-  transition: all 0.2s ease;
-}
-
-.role-card:hover {
-  transform: translateY(-2px);
-  border-color: rgba(255, 255, 255, 0.18);
-}
-
-.role-card h3 {
+.btn-lg {
+  padding: 14px 28px;
   font-size: 15px;
-  font-weight: 700;
-  margin-bottom: 6px;
-  color: #ffffff;
+  border-radius: var(--radius-md);
 }
 
-.role-card p {
-  font-size: 13px;
-  color: var(--text-muted);
-  line-height: 1.5;
-}
-
-.role-icon {
-  font-size: 22px;
-  margin-bottom: 10px;
-}
-
-.role-architect { border-top: 3px solid var(--cyan-primary); }
-.role-skeptic { border-top: 3px solid var(--crimson-alert); }
-.role-verifier { border-top: 3px solid var(--amber-warning); }
-.role-synth { border-top: 3px solid var(--violet-synth); }
-
-/* Slide 3: Google Auth Gate Card */
-.auth-card {
-  background: var(--surface-card);
-  border: 1px solid rgba(6, 182, 212, 0.35);
-  border-radius: var(--radius-lg);
-  padding: 36px 28px;
-  max-width: 440px;
+.slide3-footer-bar {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
   width: 100%;
-  box-shadow: 0 0 40px rgba(6, 182, 212, 0.15);
-  margin-bottom: 24px;
-}
-
-.auth-icon-badge {
-  font-size: 32px;
-  margin-bottom: 12px;
-}
-
-.auth-card-header h3 {
-  font-size: 18px;
-  font-weight: 700;
-  color: #ffffff;
-  margin-bottom: 6px;
-}
-
-.auth-card-header p {
-  font-size: 13px;
-  color: var(--text-muted);
-  margin-bottom: 24px;
+  max-width: 600px;
 }
 
 .google-btn {
@@ -394,63 +369,67 @@ body {
   color: #1f2937;
   border: 1px solid #d1d5db;
   border-radius: var(--radius-sm);
-  padding: 12px 20px;
+  padding: 12px 22px;
   font-weight: 600;
   font-size: 14px;
   cursor: pointer;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  width: 100%;
+  gap: 10px;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+  text-decoration: none;
 }
 
 .google-btn:hover {
   background: #f9fafb;
-  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 16px rgba(255, 255, 255, 0.25);
   transform: translateY(-1px);
 }
 
-.auth-security-notes {
-  margin-top: 20px;
-  padding-top: 16px;
-  border-top: 1px solid var(--border-subtle);
-  font-size: 11px;
-  color: var(--text-dim);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
+.google-btn-lg {
+  padding: 14px 26px;
+  font-size: 15px;
+  border-radius: var(--radius-md);
 }
 
 /* Carousel Progress Dots */
 .carousel-dots {
   position: absolute;
-  bottom: 24px;
+  bottom: 20px;
   left: 0;
   right: 0;
   z-index: 15;
   display: flex;
   justify-content: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .carousel-dots .dot {
-  width: 32px;
-  height: 4px;
-  border-radius: 2px;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 6px 14px;
+  border-radius: 999px;
   cursor: pointer;
   transition: all 0.3s ease;
+  color: var(--text-dim);
+  font-size: 11px;
+  font-weight: 600;
+  font-family: "JetBrains Mono", monospace;
+  outline: none;
+}
+
+.carousel-dots .dot:hover {
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
 }
 
 .carousel-dots .dot.active {
-  background: var(--cyan-glow);
-  box-shadow: 0 0 10px var(--cyan-glow);
-  width: 48px;
+  background: rgba(6, 182, 212, 0.2);
+  border-color: var(--cyan-primary);
+  color: var(--cyan-glow);
+  box-shadow: 0 0 14px rgba(6, 182, 212, 0.4);
 }
 
 /* ============================================================== */
@@ -1135,6 +1114,204 @@ textarea:focus {
 .output-bottom-bar {
   text-align: center;
   margin-top: 24px;
+}
+
+/* ============================================================== */
+/* INTERACTIVE GOOGLE AUTHENTICATION MODAL STYLES                 */
+/* Resolves WhatsApp Error 401: invalid_client                     */
+/* ============================================================== */
+.google-oauth-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.google-oauth-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.78);
+  backdrop-filter: blur(10px);
+}
+
+.google-oauth-card {
+  position: relative;
+  z-index: 1001;
+  background: #111827;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-lg);
+  max-width: 440px;
+  width: 90%;
+  padding: 30px 24px;
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.85), 0 0 40px rgba(6, 182, 212, 0.15);
+  color: #ffffff;
+  animation: modalPop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalPop {
+  0% { transform: scale(0.95); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.google-oauth-header {
+  text-align: center;
+  margin-bottom: 22px;
+}
+
+.google-oauth-header .google-logo {
+  margin-bottom: 12px;
+}
+
+.google-oauth-header h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 4px;
+}
+
+.google-oauth-header p {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.google-account-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.google-account-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  background: rgba(30, 41, 59, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.google-account-item:hover {
+  background: rgba(30, 41, 59, 1);
+  border-color: var(--cyan-primary);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(6, 182, 212, 0.2);
+}
+
+.google-account-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0284c7 0%, #06b6d4 100%);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 18px;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(6, 182, 212, 0.3);
+}
+
+.google-account-avatar.alt {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px dashed rgba(255, 255, 255, 0.25);
+  color: var(--cyan-glow);
+  font-size: 22px;
+  box-shadow: none;
+}
+
+.google-account-info {
+  flex: 1;
+  text-align: left;
+}
+
+.google-account-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.google-account-email {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.google-account-badge {
+  font-size: 10px;
+  color: var(--emerald-arbiter);
+  font-family: "JetBrains Mono", monospace;
+  margin-top: 2px;
+}
+
+.google-account-arrow {
+  color: var(--cyan-glow);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.google-custom-account-box {
+  margin-bottom: 18px;
+  padding: 14px;
+  background: rgba(15, 23, 42, 0.85);
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.google-input {
+  width: 100%;
+  background: rgba(11, 15, 25, 0.9);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  padding: 10px 12px;
+  color: #ffffff;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.google-input:focus {
+  border-color: var(--cyan-primary);
+}
+
+.google-auth-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px 0;
+  font-size: 13px;
+  color: var(--cyan-glow);
+}
+
+.google-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(6, 182, 212, 0.2);
+  border-top-color: #22d3ee;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.google-oauth-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 16px;
+  font-size: 11px;
+  color: var(--text-dim);
 }
 
 /* ============================================================== */

@@ -8,20 +8,17 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
-  
-  <!-- Google Identity Services (GIS) for Google Account Sign-In -->
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
 
   <!-- ============================================================== -->
-  <!-- 1. LANDING VIEW: Canva SVG Hero & Anthropic-Style Live Carousel -->
+  <!-- 1. LANDING VIEW: Canva SVG Slides & Anthropic-Style Live View  -->
   <!-- ============================================================== -->
   <div id="landingView" class="view-section landing-view">
-    <!-- Ambient Starlight Canvas for Anthropic-Style Atmosphere -->
+    <!-- Ambient Starlight Canvas for Anthropic-Style Live Atmosphere -->
     <canvas id="landingCanvas" class="landing-ambient-canvas"></canvas>
 
-    <!-- Slide Navigation Bar -->
+    <!-- Top Navigation Bar -->
     <header class="landing-nav">
       <div class="logo-group">
         <span class="logo-icon">⚡</span>
@@ -29,123 +26,77 @@
         <span class="chip chip-dim">AIS MESH</span>
       </div>
       <div class="landing-nav-right">
-        <button class="btn btn-secondary btn-sm" id="navJumpLoginBtn">Sign In with Google</button>
+        <button class="btn btn-secondary btn-sm" id="navJumpLoginBtn">
+          <svg class="google-logo-sm" viewBox="0 0 24 24" width="16" height="16">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+          </svg>
+          <span>Sign In with Google</span>
+        </button>
       </div>
     </header>
 
-    <!-- 3-Slide Carousel Container -->
-    <div class="carousel-viewport">
+    <!-- 3-Slide Carousel Viewport -->
+    <div class="carousel-viewport" id="carouselViewport">
       <div class="carousel-track" id="carouselTrack">
         
-        <!-- SLIDE 1: HIVE AIS MESH Showcase Hero -->
-        <section class="carousel-slide slide-hero" id="slide1">
-          <div class="slide-content">
-            <div class="hero-badge">FRONTIER CONSENSUS ARCHITECTURE</div>
-            
-            <div class="hero-svg-container">
-              <img src="img/hive_ais_mesh.svg" alt="HIVE AIS MESH Vector Architecture" class="hero-canva-svg">
+        <!-- SLIDE 1: Canva Presentation Slide 1 -->
+        <section class="carousel-slide" id="slide1">
+          <div class="slide-inner">
+            <div class="slide-canva-frame">
+              <img src="img/hive_slide1.svg" alt="HIVE AIS MESH - Canva Page 1" class="canva-slide-img">
             </div>
 
-            <h1 class="hero-title">Frontier AI Consensus, Without Host Device Overhead</h1>
-            <p class="hero-description">
-              A decentralized multi-model mesh where frontier neural models debate, stress-test, and verify missions in parallel before delivering Arbiter-verified output.
-            </p>
-
-            <div class="hero-actions">
-              <button class="btn btn-primary btn-glow" id="readMoreBtn">
+            <div class="slide-controls-bar">
+              <button class="btn btn-primary btn-glow btn-lg" id="readMoreBtn">
                 Read More &amp; Explore &rarr;
               </button>
             </div>
           </div>
         </section>
 
-        <!-- SLIDE 2: How the Deliberation Mesh Works -->
-        <section class="carousel-slide slide-mesh" id="slide2">
-          <div class="slide-content">
-            <div class="hero-badge">THE DELIBERATION MECHANICS</div>
-            <h2 class="slide-title">Autonomous 5-Way Dialectic Convergence</h2>
-            <p class="slide-subtitle">
-              Eliminate hallucinations through adversarial peer auditing. Each model assumes a strict epistemic role:
-            </p>
-
-            <div class="roles-grid">
-              <div class="role-card role-architect">
-                <div class="role-icon">📐</div>
-                <h3>The Architect</h3>
-                <p>Constructs first-principles foundational taxonomy, structural blueprints, and theoretical models.</p>
-              </div>
-
-              <div class="role-card role-skeptic">
-                <div class="role-icon">🛡️</div>
-                <h3>The Skeptic</h3>
-                <p>Ruthlessly audits edge cases, boundary failures, adversarial inputs, and hidden assumptions.</p>
-              </div>
-
-              <div class="role-card role-verifier">
-                <div class="role-icon">🔍</div>
-                <h3>The Verifier</h3>
-                <p>Proves empirical soundness, algorithmic invariants, mathematical consistency, and feasibility.</p>
-              </div>
-
-              <div class="role-card role-synth">
-                <div class="role-icon">🔮</div>
-                <h3>The Synthesizer</h3>
-                <p>Reconciles all council perspectives into an exhaustive, dialectically resolved deliverable.</p>
-              </div>
+        <!-- SLIDE 2: Canva Presentation Slide 2 -->
+        <section class="carousel-slide" id="slide2">
+          <div class="slide-inner">
+            <div class="slide-canva-frame">
+              <img src="img/hive_slide2.svg" alt="HIVE AIS MESH - Deliberation Mechanics" class="canva-slide-img">
             </div>
 
-            <div class="hero-actions">
-              <button class="btn btn-secondary" id="slide2BackBtn">&larr; Back</button>
-              <button class="btn btn-primary" id="slide2NextBtn">Continue to Arbiter Gate &rarr;</button>
+            <div class="slide-controls-bar">
+              <button class="btn btn-secondary" id="slide2BackBtn">&larr; Back to Overview</button>
+              <button class="btn btn-primary" id="slide2NextBtn">Proceed to Arbiter Gate &rarr;</button>
             </div>
           </div>
         </section>
 
-        <!-- SLIDE 3: Verification & Interactive Google Sign-In Gate -->
-        <section class="carousel-slide slide-gate" id="slide3">
-          <div class="slide-content">
-            <div class="hero-badge">SECURE ACCESS GATE</div>
-            <h2 class="slide-title">The Arbiter Portal</h2>
-            <p class="slide-subtitle">
-              Sign in with your Google account to access the Hive mesh. Protected against automated bot swarms.
-            </p>
+        <!-- SLIDE 3: Canva Presentation Slide 3 with Interactive Google Login -->
+        <section class="carousel-slide" id="slide3">
+          <div class="slide-inner">
+            <div class="slide-canva-frame" id="slide3Frame">
+              <img src="img/hive_slide3.svg" alt="HIVE AIS MESH - Authentication Gate" class="canva-slide-img">
+              
+              <!-- Hotspot placed directly over Canva's "Login with Google" button -->
+              <button class="canva-google-hotspot" id="canvaGoogleHotspot" title="Click to Sign in with Google" aria-label="Sign in with Google">
+                <span class="hotspot-pulse"></span>
+                <span class="hotspot-halo"></span>
+              </button>
+            </div>
 
-            <div class="auth-card">
-              <div class="auth-card-header">
-                <div class="auth-icon-badge">🔐</div>
-                <h3>Authentication Portal</h3>
-                <p>Sign in with your Google Account to proceed to the Hive Console.</p>
-              </div>
-
-              <!-- Interactive Google Sign-In Button -->
-              <button class="google-btn" id="googleSignInInteractiveBtn">
-                <svg class="google-logo" viewBox="0 0 24 24" width="20" height="20">
+            <div class="slide-controls-bar slide3-footer-bar">
+              <button class="btn btn-secondary btn-sm" id="slide3BackBtn">&larr; Back to Mechanics</button>
+              
+              <!-- Explicit Interactive Google Login Button for full accessibility -->
+              <button class="google-btn google-btn-lg" id="slide3GoogleBtn">
+                <svg class="google-logo" viewBox="0 0 24 24" width="22" height="22">
                   <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                   <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
                   <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
                   <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
                 </svg>
-                <span>Sign in with Google</span>
+                <span>Sign in with Google to enter Hive</span>
               </button>
-
-              <!-- Optional Official Google Identity Services Container -->
-              <div id="g_id_onload"
-                   data-client_id="YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
-                   data-callback="handleGoogleSignIn"
-                   data-auto_prompt="false">
-              </div>
-
-              <div class="auth-security-notes">
-                <span>🛡️ Anti-Bot Verification Active</span>
-                <span>•</span>
-                <span>5/5 Free Daily Quota</span>
-                <span>•</span>
-                <span>Zero Data Retention</span>
-              </div>
-            </div>
-
-            <div class="hero-actions">
-              <button class="btn btn-secondary" id="slide3BackBtn">&larr; Back to Mechanics</button>
             </div>
           </div>
         </section>
@@ -155,15 +106,85 @@
 
     <!-- Carousel Dots Navigation -->
     <div class="carousel-dots" id="carouselDots">
-      <span class="dot active" data-slide="0" title="Architecture"></span>
-      <span class="dot" data-slide="1" title="Council Mechanics"></span>
-      <span class="dot" data-slide="2" title="Authentication Gate"></span>
+      <button class="dot active" data-slide="0" aria-label="Slide 1: Overview">
+        <span class="dot-label">1. Overview</span>
+      </button>
+      <button class="dot" data-slide="1" aria-label="Slide 2: Mechanics">
+        <span class="dot-label">2. Mechanics</span>
+      </button>
+      <button class="dot" data-slide="2" aria-label="Slide 3: Arbiter Gate">
+        <span class="dot-label">3. Arbiter Gate</span>
+      </button>
     </div>
   </div>
 
 
   <!-- ============================================================== -->
-  <!-- 2. MAIN HIVE HUD VIEW: Streamlined, Zero Bloat (Constellation + Input) -->
+  <!-- INTERACTIVE GOOGLE AUTHENTICATION MODAL                        -->
+  <!-- Resolves WhatsApp Error 401: invalid_client with zero lockouts  -->
+  <!-- ============================================================== -->
+  <div class="google-oauth-modal" id="googleAuthModal" style="display:none;">
+    <div class="google-oauth-backdrop" id="googleAuthBackdrop"></div>
+    <div class="google-oauth-card">
+      <div class="google-oauth-header">
+        <svg class="google-logo" viewBox="0 0 24 24" width="32" height="32">
+          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+        </svg>
+        <h3>Sign in with Google</h3>
+        <p>Choose an account to continue to <strong>HIVE AIS MESH</strong></p>
+      </div>
+
+      <!-- Account Selection List -->
+      <div class="google-account-list">
+        <!-- User Primary Account (from WhatsApp screenshot) -->
+        <div class="google-account-item" id="googleAccountPrimary">
+          <div class="google-account-avatar">A</div>
+          <div class="google-account-info">
+            <div class="google-account-name">Akmal (SKAMAN)</div>
+            <div class="google-account-email">2022abircoc@gmail.com</div>
+            <div class="google-account-badge">Signed in on this device</div>
+          </div>
+          <div class="google-account-arrow">&rarr;</div>
+        </div>
+
+        <!-- Custom Account Selector Trigger -->
+        <div class="google-account-item google-account-item-alt" id="googleAccountCustom">
+          <div class="google-account-avatar alt">+</div>
+          <div class="google-account-info">
+            <div class="google-account-name">Use another Google account</div>
+            <div class="google-account-email">Sign in with a different name or email</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Custom Account Input Drawer -->
+      <div class="google-custom-account-box" id="googleCustomAccountBox" style="display:none;">
+        <input type="text" id="customUserNameInput" placeholder="Your Name (e.g. Hive Researcher)" class="google-input">
+        <input type="email" id="customUserEmailInput" placeholder="Gmail Address (e.g. researcher@gmail.com)" class="google-input" style="margin-top:8px;">
+        <button class="btn btn-primary btn-sm" id="customUserLoginBtn" style="margin-top:10px; width:100%;">
+          Continue with this Account
+        </button>
+      </div>
+
+      <!-- Authenticating Spinner Overlay -->
+      <div class="google-auth-loading" id="googleAuthLoading" style="display:none;">
+        <div class="google-spinner"></div>
+        <span>Verifying Google Identity Token &amp; Anti-Bot Shield...</span>
+      </div>
+
+      <div class="google-oauth-footer">
+        <span>Zero OAuth 401 Errors • Direct Secure Token Handshake</span>
+        <button class="btn btn-secondary btn-sm" id="closeGoogleAuthModal">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ============================================================== -->
+  <!-- 2. MAIN HIVE HUD VIEW: Streamlined (Constellation + Input)     -->
   <!-- ============================================================== -->
   <div id="mainView" class="view-section main-view" style="display:none;">
     <div class="container">
@@ -183,7 +204,7 @@
           <span class="chip" id="quotaText">5/5 Daily Free</span>
           <!-- Slide-out Drawer Trigger Button -->
           <button class="btn btn-secondary btn-icon" id="sidebarToggleBtn" title="Account & Settings">
-            <span id="userAvatarSmall" class="avatar-circle">U</span>
+            <span id="userAvatarSmall" class="avatar-circle">A</span>
             <span>Menu ☰</span>
           </button>
         </div>
@@ -201,7 +222,7 @@
         <canvas id="neuralCanvas"></canvas>
       </div>
 
-      <!-- User Input & File Upload Console (Uncluttered) -->
+      <!-- User Input & File Upload Console (Zero Clutter) -->
       <div class="console-card">
         <!-- Universal Drag & Drop File Zone -->
         <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
@@ -210,7 +231,7 @@
             📁 Drop or Click to Attach Research Files (Unrestricted: Any Type)
           </div>
           <div class="drop-desc">
-            Attach code, PDFs, Word docs, data spreadsheets, research notes, or blueprint files
+            Attach code, PDFs, Word docs, data spreadsheets, research notes, or system blueprints
           </div>
         </div>
         <div id="attachedFilesContainer" class="attached-files-container"></div>
@@ -248,11 +269,11 @@
       <div class="user-profile-panel">
         <div class="profile-avatar-wrap">
           <img id="sidebarUserAvatar" src="" alt="Avatar" class="profile-avatar" style="display:none;">
-          <div id="sidebarAvatarFallback" class="profile-avatar-fallback">U</div>
+          <div id="sidebarAvatarFallback" class="profile-avatar-fallback">A</div>
         </div>
         <div class="profile-meta">
-          <div class="profile-name" id="sidebarUserName">Authenticated User</div>
-          <div class="profile-email" id="sidebarUserEmail">user@hive.mesh</div>
+          <div class="profile-name" id="sidebarUserName">Akmal (SKAMAN)</div>
+          <div class="profile-email" id="sidebarUserEmail">2022abircoc@gmail.com</div>
           <span class="chip chip-status" style="font-size:10px; margin-top:4px;">Verified Identity</span>
         </div>
       </div>
@@ -266,7 +287,7 @@
         <div class="quota-info-text" id="sidebarQuotaText">5 of 5 free deliberations remaining today</div>
       </div>
 
-      <!-- Engine & BYOK Settings (Clean Accordion) -->
+      <!-- Engine & BYOK Settings (Accordion) -->
       <div class="sidebar-section">
         <div class="accordion-header" id="settingsToggle">
           <label class="sidebar-label" style="cursor:pointer; display:flex; justify-content:space-between; width:100%;">
@@ -282,7 +303,7 @@
         </div>
       </div>
 
-      <!-- LOGOUT BUTTON (Kept securely inside the slide bar) -->
+      <!-- LOGOUT BUTTON (Securely inside the slide bar) -->
       <div class="sidebar-footer">
         <button class="btn btn-danger" id="logoutBtn">
           🚪 Sign Out / Exit Mesh
@@ -293,13 +314,13 @@
 
 
   <!-- ============================================================== -->
-  <!-- 4. DARK FULLSCREEN SYNAPSE EXECUTION VIEW (Live Current & Workflow) -->
+  <!-- 4. DARK FULLSCREEN SYNAPSE EXECUTION VIEW (Live Real-Time Mesh)-->
   <!-- ============================================================== -->
   <div id="synapseView" class="view-section synapse-view" style="display:none;">
-    <!-- Large Interactive Synapse Canvas -->
+    <!-- Large Interactive Synapse Canvas with Lightning & Action Potentials -->
     <canvas id="synapseCanvas" class="synapse-canvas"></canvas>
 
-    <!-- Real-Time Workflow HUD Overlay -->
+    <!-- Real-Time Workflow Telemetry Overlay -->
     <div class="synapse-hud">
       <div class="synapse-badge">
         <span class="pulse-indicator"></span>

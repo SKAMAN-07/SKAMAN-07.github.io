@@ -4,6 +4,7 @@
  * - Real-time electrical synapse current passing & action potential pulses
  * - Ambient Anthropic-style landing mesh
  * - Fullscreen dark synapse execution canvas with real-time workflow phases
+ * - Interactive cursor/touch electrical lightning arcs
  */
 
 class NeuralConstellation {
@@ -22,6 +23,10 @@ class NeuralConstellation {
     this.particles = [];   // Ambient cosmic starlight
     this.phaseText = "INITIALIZING SYNAPTIC VECTORS...";
     
+    // Slow emergence fade-in control
+    this.fadeInProgress = this.isSynapseMode ? 0 : 1.0;
+    this.fadeInSpeed = 0.015; // Reaches full opacity in ~1.2s at 60 FPS
+
     this.mouse = { x: -1000, y: -1000, active: false };
     this.animId = null;
     this.isRunning = false;
@@ -33,7 +38,7 @@ class NeuralConstellation {
       verifier: { main: '#fbbf24', glow: 'rgba(251, 191, 36, 0.9)', name: 'Verifier' },
       synthesizer: { main: '#c084fc', glow: 'rgba(192, 132, 252, 0.9)', name: 'Synthesizer' },
       synapseElectric: '#22d3ee',
-      ambient: { main: '#60a5fa', glow: 'rgba(96, 165, 250, 0.3)', name: 'Neuron' }
+      ambient: { main: '#60a5fa', glow: 'rgba(96, 165, 250, 0.35)', name: 'Neuron' }
     };
 
     this.init();
@@ -77,6 +82,10 @@ class NeuralConstellation {
     this.start();
   }
 
+  resetFadeIn() {
+    this.fadeInProgress = 0;
+  }
+
   resize() {
     if (!this.canvas) return;
     const parent = this.canvas.parentElement;
@@ -84,7 +93,7 @@ class NeuralConstellation {
     const width = parent ? parent.clientWidth : window.innerWidth;
     const height = this.isSynapseMode 
       ? (parent ? parent.clientHeight : window.innerHeight) 
-      : (this.isLandingMode ? (parent ? parent.clientHeight : 500) : 340);
+      : (this.isLandingMode ? (parent ? parent.clientHeight : 540) : 340);
 
     this.width = width;
     this.height = height;
@@ -102,8 +111,12 @@ class NeuralConstellation {
     this.nodes = [];
     const focalKeys = ['arbiter', 'architect', 'skeptic', 'verifier', 'synthesizer'];
 
-    // 1. Primary Council Neurons
+    // 1. Primary Council Neurons (Larger in Synapse Mode for high visual impact)
     focalKeys.forEach((key, index) => {
+      const baseR = this.isSynapseMode 
+        ? (key === 'arbiter' ? 24 : 18) 
+        : (key === 'arbiter' ? 14 : 11);
+
       this.nodes.push({
         id: key,
         isFocal: true,
@@ -112,16 +125,16 @@ class NeuralConstellation {
         color: this.colors[key],
         x: 0,
         y: 0,
-        baseRadius: this.isSynapseMode ? (key === 'arbiter' ? 18 : 14) : (key === 'arbiter' ? 14 : 11),
-        radius: this.isSynapseMode ? 16 : 12,
+        baseRadius: baseR,
+        radius: baseR,
         energy: 1.0,
         pulsePhase: index * 0.9,
         charge: 1.0
       });
     });
 
-    // 2. Dense Synaptic Network Neurons
-    const ambientCount = this.isSynapseMode ? 45 : (this.isLandingMode ? 35 : 25);
+    // 2. Synaptic Network Interneurons
+    const ambientCount = this.isSynapseMode ? 55 : (this.isLandingMode ? 40 : 25);
     for (let i = 0; i < ambientCount; i++) {
       this.nodes.push({
         id: `neuron_${i}`,
@@ -131,10 +144,10 @@ class NeuralConstellation {
         color: this.colors.ambient,
         x: Math.random() * (this.width || 800),
         y: Math.random() * (this.height || 400),
-        vx: (Math.random() - 0.5) * (this.isSynapseMode ? 0.6 : 0.3),
-        vy: (Math.random() - 0.5) * (this.isSynapseMode ? 0.6 : 0.3),
-        baseRadius: Math.random() * 3 + 1.5,
-        radius: Math.random() * 3 + 1.5,
+        vx: (Math.random() - 0.5) * (this.isSynapseMode ? 0.7 : 0.3),
+        vy: (Math.random() - 0.5) * (this.isSynapseMode ? 0.7 : 0.3),
+        baseRadius: Math.random() * 3.5 + 2.0,
+        radius: Math.random() * 3.5 + 2.0,
         energy: Math.random() * 0.5 + 0.3,
         pulsePhase: Math.random() * Math.PI * 2,
         charge: Math.random()
@@ -148,14 +161,18 @@ class NeuralConstellation {
   positionNodes() {
     const cx = this.width / 2;
     const cy = this.height / 2;
-    const scale = this.isSynapseMode ? 1.25 : 1.0;
+    
+    // Scale factor makes the constellation BIG in Fullscreen Synapse mode
+    const scale = this.isSynapseMode 
+      ? Math.min(1.65, Math.max(1.1, this.width / 750)) 
+      : Math.min(1.0, this.width / 900);
 
     const focalPositions = {
-      arbiter: { x: cx, y: cy - 100 * scale },
-      architect: { x: cx - 250 * scale, y: cy - 25 * scale },
-      skeptic: { x: cx - 130 * scale, y: cy + 85 * scale },
-      verifier: { x: cx + 130 * scale, y: cy + 85 * scale },
-      synthesizer: { x: cx + 250 * scale, y: cy - 25 * scale }
+      arbiter: { x: cx, y: cy - 130 * scale },
+      architect: { x: cx - 280 * scale, y: cy - 35 * scale },
+      skeptic: { x: cx - 150 * scale, y: cy + 110 * scale },
+      verifier: { x: cx + 150 * scale, y: cy + 110 * scale },
+      synthesizer: { x: cx + 280 * scale, y: cy - 35 * scale }
     };
 
     this.nodes.forEach(n => {
@@ -189,21 +206,21 @@ class NeuralConstellation {
       let minDist = 9999;
       focalNodes.forEach(foc => {
         const d = Math.hypot(foc.x - amb.x, foc.y - amb.y);
-        if (d < minDist && d < (this.isSynapseMode ? 280 : 220)) {
+        if (d < minDist && d < (this.isSynapseMode ? 320 : 220)) {
           minDist = d;
           nearestFocal = foc;
         }
       });
       if (nearestFocal) {
-        this.edges.push({ source: nearestFocal, target: amb, isCore: false, strength: 0.35 });
+        this.edges.push({ source: nearestFocal, target: amb, isCore: false, strength: 0.4 });
       }
 
       // Interconnect nearby neurons
       ambientNodes.forEach(other => {
         if (amb !== other) {
           const d = Math.hypot(amb.x - other.x, amb.y - other.y);
-          if (d < (this.isSynapseMode ? 110 : 90) && Math.random() < 0.12) {
-            this.edges.push({ source: amb, target: other, isCore: false, strength: 0.2 });
+          if (d < (this.isSynapseMode ? 130 : 90) && Math.random() < 0.14) {
+            this.edges.push({ source: amb, target: other, isCore: false, strength: 0.25 });
           }
         }
       });
@@ -212,15 +229,15 @@ class NeuralConstellation {
 
   createAmbientDust() {
     this.particles = [];
-    const count = this.isSynapseMode ? 80 : 50;
+    const count = this.isSynapseMode ? 90 : 50;
     for (let i = 0; i < count; i++) {
       this.particles.push({
         x: Math.random() * (this.width || 800),
         y: Math.random() * (this.height || 400),
-        size: Math.random() * 1.8 + 0.4,
-        alpha: Math.random() * 0.5 + 0.2,
-        speedX: (Math.random() - 0.5) * 0.3,
-        speedY: (Math.random() - 0.5) * 0.3
+        size: Math.random() * 2.2 + 0.6,
+        alpha: Math.random() * 0.6 + 0.2,
+        speedX: (Math.random() - 0.5) * 0.35,
+        speedY: (Math.random() - 0.5) * 0.35
       });
     }
   }
@@ -237,10 +254,10 @@ class NeuralConstellation {
       source: s,
       target: t,
       progress: 0,
-      speed: 0.03 + Math.random() * 0.025,
+      speed: 0.035 + Math.random() * 0.03,
       color: color || s.color.main,
-      size: this.isSynapseMode ? 5.5 : 4.0,
-      tailLength: 28,
+      size: this.isSynapseMode ? 6.5 : 4.0,
+      tailLength: this.isSynapseMode ? 36 : 24,
       isElectric: true
     });
 
@@ -251,9 +268,9 @@ class NeuralConstellation {
     this.rings.push({
       x, y,
       radius: 6,
-      maxRadius: this.isSynapseMode ? 60 : 44,
-      alpha: 0.9,
-      speed: 1.8,
+      maxRadius: this.isSynapseMode ? 70 : 44,
+      alpha: 0.95,
+      speed: 2.2,
       color
     });
   }
@@ -270,9 +287,9 @@ class NeuralConstellation {
       source: edge.source,
       target: edge.target,
       progress: 0,
-      speed: 0.04 + Math.random() * 0.03,
+      speed: 0.045 + Math.random() * 0.035,
       color,
-      size: 4.8,
+      size: this.isSynapseMode ? 5.5 : 4.0,
       tailLength: 32,
       isElectric: true
     });
@@ -334,12 +351,20 @@ class NeuralConstellation {
   animate() {
     if (!this.isRunning) return;
 
+    // Advance fade-in opacity ramp (slow emergence out of darkness)
+    if (this.fadeInProgress < 1.0) {
+      this.fadeInProgress = Math.min(1.0, this.fadeInProgress + this.fadeInSpeed);
+    }
+
     this.ctx.clearRect(0, 0, this.width, this.height);
+
+    this.ctx.save();
+    this.ctx.globalAlpha = this.fadeInProgress;
 
     const time = Date.now() * 0.002;
 
-    // In Synapse mode, generate periodic electric discharges
-    if (this.isSynapseMode && Math.random() < 0.35) {
+    // In Synapse mode, generate frequent high-voltage electric discharges
+    if (this.isSynapseMode && Math.random() < 0.45) {
       this.triggerSynapticBurst();
     }
 
@@ -375,39 +400,39 @@ class NeuralConstellation {
 
       // Base synapse line
       const grad = this.ctx.createLinearGradient(e.source.x, e.source.y, e.target.x, e.target.y);
-      const baseAlpha = isCore ? (this.isSynapseMode ? 0.45 : 0.35) : 0.12;
-      const pulsate = Math.sin(time * 2 + dist * 0.01) * 0.15;
-      const opacity = Math.max(0.08, baseAlpha + pulsate);
+      const baseAlpha = isCore ? (this.isSynapseMode ? 0.55 : 0.35) : 0.16;
+      const pulsate = Math.sin(time * 2 + dist * 0.01) * 0.18;
+      const opacity = Math.max(0.1, baseAlpha + pulsate);
 
       grad.addColorStop(0, e.source.color.glow.replace(/[\d\.]+\)$/, `${opacity})`));
       grad.addColorStop(1, e.target.color.glow.replace(/[\d\.]+\)$/, `${opacity})`));
 
       this.ctx.strokeStyle = grad;
-      this.ctx.lineWidth = isCore ? (this.isSynapseMode ? 2.0 : 1.4) : 0.8;
+      this.ctx.lineWidth = isCore ? (this.isSynapseMode ? 2.6 : 1.4) : 1.0;
       this.ctx.beginPath();
       this.ctx.moveTo(e.source.x, e.source.y);
 
-      // In Synapse mode, add subtle electric arc jitter to core lines
-      if (this.isSynapseMode && isCore && Math.random() < 0.15) {
-        const midX = (e.source.x + e.target.x) / 2 + (Math.random() - 0.5) * 8;
-        const midY = (e.source.y + e.target.y) / 2 + (Math.random() - 0.5) * 8;
+      // In Synapse mode, add crackling electric micro-arc jitter to core lines
+      if (this.isSynapseMode && isCore && Math.random() < 0.22) {
+        const midX = (e.source.x + e.target.x) / 2 + (Math.random() - 0.5) * 12;
+        const midY = (e.source.y + e.target.y) / 2 + (Math.random() - 0.5) * 12;
         this.ctx.lineTo(midX, midY);
       }
 
       this.ctx.lineTo(e.target.x, e.target.y);
       this.ctx.stroke();
 
-      // Mouse attraction electric arc in Synapse mode
+      // Mouse / Touch attraction electric lightning arc in Synapse mode
       if (this.isSynapseMode && this.mouse.active) {
         const dMouse = Math.hypot(this.mouse.x - e.source.x, this.mouse.y - e.source.y);
-        if (dMouse < 140 && Math.random() < 0.08) {
+        if (dMouse < 180 && Math.random() < 0.12) {
           this.ctx.save();
-          this.ctx.strokeStyle = 'rgba(34, 211, 238, 0.6)';
-          this.ctx.lineWidth = 1.2;
+          this.ctx.strokeStyle = 'rgba(34, 211, 238, 0.75)';
+          this.ctx.lineWidth = 1.6;
           this.ctx.beginPath();
           this.ctx.moveTo(e.source.x, e.source.y);
-          const jX = (e.source.x + this.mouse.x) / 2 + (Math.random() - 0.5) * 16;
-          const jY = (e.source.y + this.mouse.y) / 2 + (Math.random() - 0.5) * 16;
+          const jX = (e.source.x + this.mouse.x) / 2 + (Math.random() - 0.5) * 20;
+          const jY = (e.source.y + this.mouse.y) / 2 + (Math.random() - 0.5) * 20;
           this.ctx.lineTo(jX, jY);
           this.ctx.lineTo(this.mouse.x, this.mouse.y);
           this.ctx.stroke();
@@ -429,8 +454,8 @@ class NeuralConstellation {
 
       this.ctx.save();
       this.ctx.strokeStyle = ring.color;
-      this.ctx.globalAlpha = Math.max(0, ring.alpha);
-      this.ctx.lineWidth = 1.5;
+      this.ctx.globalAlpha = Math.max(0, ring.alpha * this.fadeInProgress);
+      this.ctx.lineWidth = this.isSynapseMode ? 2.2 : 1.5;
       this.ctx.beginPath();
       this.ctx.arc(ring.x, ring.y, ring.radius, 0, Math.PI * 2);
       this.ctx.stroke();
@@ -451,26 +476,26 @@ class NeuralConstellation {
       const currX = p.source.x + (p.target.x - p.source.x) * p.progress;
       const currY = p.source.y + (p.target.y - p.source.y) * p.progress;
       
-      const tailProg = Math.max(0, p.progress - 0.16);
+      const tailProg = Math.max(0, p.progress - 0.18);
       const tailX = p.source.x + (p.target.x - p.source.x) * tailProg;
       const tailY = p.source.y + (p.target.y - p.source.y) * tailProg;
 
       // Electric streak
       const beamGrad = this.ctx.createLinearGradient(tailX, tailY, currX, currY);
       beamGrad.addColorStop(0, 'rgba(255, 255, 255, 0)');
-      beamGrad.addColorStop(0.4, p.color);
+      beamGrad.addColorStop(0.35, p.color);
       beamGrad.addColorStop(1, '#ffffff');
 
       this.ctx.save();
       this.ctx.strokeStyle = beamGrad;
-      this.ctx.lineWidth = this.isSynapseMode ? 3.8 : 3.0;
+      this.ctx.lineWidth = this.isSynapseMode ? 4.5 : 3.0;
       this.ctx.beginPath();
       this.ctx.moveTo(tailX, tailY);
 
       // Lightning jitter along pulse
-      if (this.isSynapseMode && Math.random() < 0.4) {
-        const jX = (tailX + currX) / 2 + (Math.random() - 0.5) * 6;
-        const jY = (tailY + currY) / 2 + (Math.random() - 0.5) * 6;
+      if (this.isSynapseMode && Math.random() < 0.45) {
+        const jX = (tailX + currX) / 2 + (Math.random() - 0.5) * 8;
+        const jY = (tailY + currY) / 2 + (Math.random() - 0.5) * 8;
         this.ctx.lineTo(jX, jY);
       }
 
@@ -480,7 +505,7 @@ class NeuralConstellation {
       // Leading glowing photon head
       this.ctx.fillStyle = '#ffffff';
       this.ctx.shadowColor = p.color;
-      this.ctx.shadowBlur = this.isSynapseMode ? 18 : 12;
+      this.ctx.shadowBlur = this.isSynapseMode ? 22 : 12;
       this.ctx.beginPath();
       this.ctx.arc(currX, currY, p.size, 0, Math.PI * 2);
       this.ctx.fill();
@@ -490,12 +515,12 @@ class NeuralConstellation {
     // 6. Render Neurons
     this.nodes.forEach(n => {
       const isArbiter = (n.id === 'arbiter');
-      const pulseMod = Math.sin(time * 3 + n.pulsePhase) * 1.8;
+      const pulseMod = Math.sin(time * 3 + n.pulsePhase) * 2.2;
       const r = n.baseRadius + (n.isFocal ? pulseMod : 0);
 
       this.ctx.save();
       this.ctx.shadowColor = n.color.main;
-      this.ctx.shadowBlur = n.isFocal ? (this.isSynapseMode ? 28 : 18) : 6;
+      this.ctx.shadowBlur = n.isFocal ? (this.isSynapseMode ? 32 : 18) : 8;
 
       // Base circle
       this.ctx.fillStyle = n.color.main;
@@ -507,56 +532,38 @@ class NeuralConstellation {
         // Core center
         this.ctx.fillStyle = '#ffffff';
         this.ctx.beginPath();
-        this.ctx.arc(n.x, n.y, r * 0.45, 0, Math.PI * 2);
+        this.ctx.arc(n.x, n.y, r * 0.48, 0, Math.PI * 2);
         this.ctx.fill();
 
         // Orbiting halo ring
         this.ctx.strokeStyle = n.color.glow;
-        this.ctx.lineWidth = 1.3;
+        this.ctx.lineWidth = this.isSynapseMode ? 1.8 : 1.3;
         this.ctx.beginPath();
-        this.ctx.arc(n.x, n.y, r + 8, 0, Math.PI * 2);
+        this.ctx.arc(n.x, n.y, r + (this.isSynapseMode ? 11 : 8), 0, Math.PI * 2);
         this.ctx.stroke();
 
         if (isArbiter) {
-          this.ctx.strokeStyle = 'rgba(52, 211, 153, 0.5)';
-          this.ctx.setLineDash([6, 3]);
+          this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.45)';
+          this.ctx.lineWidth = 1.0;
           this.ctx.beginPath();
-          this.ctx.arc(n.x, n.y, r + 16, 0, Math.PI * 2);
+          this.ctx.arc(n.x, n.y, r + (this.isSynapseMode ? 18 : 14), 0, Math.PI * 2);
           this.ctx.stroke();
         }
 
-        // Neuron label
-        this.ctx.restore();
-        this.ctx.save();
-        this.ctx.fillStyle = '#e2e8f0';
-        this.ctx.font = '700 11px "JetBrains Mono", monospace';
+        // Council Node Typography Label
+        this.ctx.fillStyle = '#ffffff';
+        this.ctx.font = this.isSynapseMode ? "700 13px 'JetBrains Mono', monospace" : "600 11px 'JetBrains Mono', monospace";
         this.ctx.textAlign = 'center';
-        this.ctx.fillText(n.label, n.x, n.y + r + 20);
-        this.ctx.restore();
-      } else {
-        this.ctx.restore();
+        this.ctx.textBaseline = 'top';
+        this.ctx.shadowColor = 'rgba(0,0,0,0.9)';
+        this.ctx.shadowBlur = 4;
+        this.ctx.fillText(n.label, n.x, n.y + r + (this.isSynapseMode ? 16 : 10));
       }
+
+      this.ctx.restore();
     });
 
-    // 7. In Synapse Fullscreen Mode: Render Real-Time Workflow HUD Overlay
-    if (this.isSynapseMode) {
-      this.ctx.save();
-      this.ctx.textAlign = 'center';
-      
-      // Real-time stage text
-      this.ctx.font = '700 13px "JetBrains Mono", monospace';
-      this.ctx.fillStyle = '#34d399';
-      this.ctx.shadowColor = '#34d399';
-      this.ctx.shadowBlur = 10;
-      this.ctx.fillText(this.phaseText, this.width / 2, this.height - 40);
-
-      // Top telemetry
-      this.ctx.font = '600 11px "JetBrains Mono", monospace';
-      this.ctx.fillStyle = 'rgba(148, 163, 184, 0.7)';
-      this.ctx.shadowBlur = 0;
-      this.ctx.fillText("SYNAPSE CURRENT: 60 FPS • ACTION POTENTIALS: ACTIVE • TOPOLOGY: 5-WAY FRONTIER MESH", this.width / 2, 35);
-      this.ctx.restore();
-    }
+    this.ctx.restore(); // Restore globalAlpha
 
     this.animId = requestAnimationFrame(() => this.animate());
   }

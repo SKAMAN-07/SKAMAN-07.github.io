@@ -1,7 +1,8 @@
 /**
  * Hive Application Controller
- * Orchestrates Landing Carousel, Google Auth Gate, Streamlined Main HUD,
- * Slide-out Sidebar Drawer, Fullscreen Dark Synapse Execution, and Output View.
+ * Orchestrates Landing Canva Carousel, Interactive Google Authentication,
+ * Streamlined Main HUD, Slide-out Sidebar Drawer, Fullscreen Dark Synapse Execution,
+ * and Verified Deliverable Output View.
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -14,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let attachedFiles = [];
   let currentDeliverable = "";
   let currentDeliberationResult = null;
+  let autoSwipeTimer = null;
 
   // 2. DOM Elements
   const landingView = document.getElementById('landingView');
@@ -29,7 +31,20 @@ document.addEventListener('DOMContentLoaded', () => {
   const slide2NextBtn = document.getElementById('slide2NextBtn');
   const slide2BackBtn = document.getElementById('slide2BackBtn');
   const slide3BackBtn = document.getElementById('slide3BackBtn');
-  const googleSignInInteractiveBtn = document.getElementById('googleSignInInteractiveBtn');
+  const canvaGoogleHotspot = document.getElementById('canvaGoogleHotspot');
+  const slide3GoogleBtn = document.getElementById('slide3GoogleBtn');
+
+  // Google Authentication Modal Elements
+  const googleAuthModal = document.getElementById('googleAuthModal');
+  const googleAuthBackdrop = document.getElementById('googleAuthBackdrop');
+  const closeGoogleAuthModal = document.getElementById('closeGoogleAuthModal');
+  const googleAccountPrimary = document.getElementById('googleAccountPrimary');
+  const googleAccountCustom = document.getElementById('googleAccountCustom');
+  const googleCustomAccountBox = document.getElementById('googleCustomAccountBox');
+  const customUserNameInput = document.getElementById('customUserNameInput');
+  const customUserEmailInput = document.getElementById('customUserEmailInput');
+  const customUserLoginBtn = document.getElementById('customUserLoginBtn');
+  const googleAuthLoading = document.getElementById('googleAuthLoading');
 
   // Main HUD Elements
   const queryInput = document.getElementById('queryInput');
@@ -74,18 +89,19 @@ document.addEventListener('DOMContentLoaded', () => {
   const chatInput = document.getElementById('chatInput');
   const chatSendBtn = document.getElementById('chatSendBtn');
 
-  // 3. Canvas Engines
-  // (a) Ambient Starlight on Landing
+  // 3. Canvas Visualizer Instances
+  // (a) Ambient Starlight Canvas on Landing
   const landingCanvasObj = new NeuralConstellation('landingCanvas', { isLandingMode: true });
   // (b) Main HUD Constellation
   let mainConstellationObj = null;
   // (c) Fullscreen Dark Synapse Canvas
   let synapseConstellationObj = null;
 
-  // 4. View Routing & Initial State
+  // 4. View Routing & Authentication Gate
   function syncAuthDisplay() {
     const isAuth = security.isAuthenticated();
     if (isAuth) {
+      // User is authenticated: Show Main Hive HUD
       landingView.style.display = 'none';
       mainView.style.display = 'block';
       synapseView.style.display = 'none';
@@ -97,21 +113,27 @@ document.addEventListener('DOMContentLoaded', () => {
         window.neuralConstellation = mainConstellationObj;
       } else {
         mainConstellationObj.resize();
+        mainConstellationObj.start();
       }
 
-      // Update User Profile in Sidebar
+      // Update User Profile in Sidebar and Top HUD
       const user = security.currentUser;
-      const initial = (user.name || 'U').charAt(0).toUpperCase();
-      document.getElementById('userAvatarSmall').innerText = initial;
-      document.getElementById('sidebarAvatarFallback').innerText = initial;
-      document.getElementById('sidebarUserName').innerText = user.name || 'Authenticated User';
-      document.getElementById('sidebarUserEmail').innerText = user.email || 'user@hive.mesh';
+      const initial = (user.name || 'A').charAt(0).toUpperCase();
+      const userAvatarSmall = document.getElementById('userAvatarSmall');
+      const sidebarAvatarFallback = document.getElementById('sidebarAvatarFallback');
+      const sidebarUserName = document.getElementById('sidebarUserName');
+      const sidebarUserEmail = document.getElementById('sidebarUserEmail');
+      const sidebarUserAvatar = document.getElementById('sidebarUserAvatar');
 
-      if (user.picture) {
-        const pImg = document.getElementById('sidebarUserAvatar');
-        pImg.src = user.picture;
-        pImg.style.display = 'block';
-        document.getElementById('sidebarAvatarFallback').style.display = 'none';
+      if (userAvatarSmall) userAvatarSmall.innerText = initial;
+      if (sidebarAvatarFallback) sidebarAvatarFallback.innerText = initial;
+      if (sidebarUserName) sidebarUserName.innerText = user.name || 'Akmal (SKAMAN)';
+      if (sidebarUserEmail) sidebarUserEmail.innerText = user.email || '2022abircoc@gmail.com';
+
+      if (user.picture && sidebarUserAvatar) {
+        sidebarUserAvatar.src = user.picture;
+        sidebarUserAvatar.style.display = 'block';
+        if (sidebarAvatarFallback) sidebarAvatarFallback.style.display = 'none';
       }
 
       // Quota display
@@ -128,7 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
         quotaProgressBar.style.width = hasKey ? '100%' : `${(remainingQuota / 5) * 100}%`;
       }
     } else {
-      // Unauthenticated visitor: Landing view first
+      // Unauthenticated visitor: MUST show Landing view first
       landingView.style.display = 'flex';
       mainView.style.display = 'none';
       synapseView.style.display = 'none';
@@ -143,6 +165,11 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentSlideIndex = 0;
 
   function goToSlide(index) {
+    if (autoSwipeTimer) {
+      clearTimeout(autoSwipeTimer);
+      autoSwipeTimer = null;
+    }
+
     currentSlideIndex = Math.max(0, Math.min(2, index));
     if (carouselTrack) {
       carouselTrack.style.transform = `translateX(-${currentSlideIndex * 100}%)`;
@@ -152,20 +179,39 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  if (readMoreBtn) readMoreBtn.addEventListener('click', () => goToSlide(1));
-  if (navJumpLoginBtn) navJumpLoginBtn.addEventListener('click', () => goToSlide(2));
+  // When clicking "Read More", slowly swipe towards Slide 2 and then Slide 3
+  if (readMoreBtn) {
+    readMoreBtn.addEventListener('click', () => {
+      goToSlide(1);
+      // Auto-progress slowly to Slide 3 (Arbiter Gate) after 2.8 seconds
+      autoSwipeTimer = setTimeout(() => {
+        if (currentSlideIndex === 1) {
+          goToSlide(2);
+        }
+      }, 2800);
+    });
+  }
+
+  if (navJumpLoginBtn) navJumpLoginBtn.addEventListener('click', () => openGoogleAuthModal());
   if (slide2NextBtn) slide2NextBtn.addEventListener('click', () => goToSlide(2));
   if (slide2BackBtn) slide2BackBtn.addEventListener('click', () => goToSlide(0));
   if (slide3BackBtn) slide3BackBtn.addEventListener('click', () => goToSlide(1));
 
+  // Canva Slide 3 Google Sign-In Triggers
+  if (canvaGoogleHotspot) canvaGoogleHotspot.addEventListener('click', () => openGoogleAuthModal());
+  if (slide3GoogleBtn) slide3GoogleBtn.addEventListener('click', () => openGoogleAuthModal());
+
   dots.forEach(dot => {
     dot.addEventListener('click', (e) => {
-      const idx = parseInt(e.target.getAttribute('data-slide') || '0');
-      goToSlide(idx);
+      const btn = e.target.closest('.dot');
+      if (btn) {
+        const idx = parseInt(btn.getAttribute('data-slide') || '0');
+        goToSlide(idx);
+      }
     });
   });
 
-  // Touch swipe support on Carousel (for mobile / WhatsApp browsers)
+  // Mobile Touch Swipe Support
   let touchStartX = 0;
   let touchEndX = 0;
   if (carouselTrack) {
@@ -181,20 +227,58 @@ document.addEventListener('DOMContentLoaded', () => {
     }, { passive: true });
   }
 
-  // 6. Interactive Google Authentication
-  if (googleSignInInteractiveBtn) {
-    googleSignInInteractiveBtn.addEventListener('click', () => {
-      security.signInWithGoogleInteractive("Akmal (SKAMAN)");
-      syncAuthDisplay();
+  // 6. Interactive Google Authentication Modal Controller
+  function openGoogleAuthModal() {
+    if (googleAuthModal) {
+      googleAuthModal.style.display = 'flex';
+      if (googleAuthLoading) googleAuthLoading.style.display = 'none';
+      if (googleCustomAccountBox) googleCustomAccountBox.style.display = 'none';
+    }
+  }
+
+  function closeGoogleAuth() {
+    if (googleAuthModal) googleAuthModal.style.display = 'none';
+  }
+
+  if (closeGoogleAuthModal) closeGoogleAuthModal.addEventListener('click', closeGoogleAuth);
+  if (googleAuthBackdrop) googleAuthBackdrop.addEventListener('click', closeGoogleAuth);
+
+  // Sign in with Primary Account (Akmal / 2022abircoc@gmail.com from WhatsApp screenshot)
+  if (googleAccountPrimary) {
+    googleAccountPrimary.addEventListener('click', () => {
+      executeGoogleAuth("Akmal (SKAMAN)", "2022abircoc@gmail.com");
     });
   }
 
-  window.handleGoogleSignIn = (googleResponse) => {
-    const user = security.handleGoogleCredential(googleResponse);
-    if (user) {
+  // Toggle Custom Account form
+  if (googleAccountCustom) {
+    googleAccountCustom.addEventListener('click', () => {
+      if (googleCustomAccountBox) {
+        const isHidden = googleCustomAccountBox.style.display === 'none';
+        googleCustomAccountBox.style.display = isHidden ? 'block' : 'none';
+      }
+    });
+  }
+
+  // Sign in with Custom Account
+  if (customUserLoginBtn) {
+    customUserLoginBtn.addEventListener('click', () => {
+      const name = (customUserNameInput && customUserNameInput.value.trim()) || "Hive Researcher";
+      const email = (customUserEmailInput && customUserEmailInput.value.trim()) || "researcher@gmail.com";
+      executeGoogleAuth(name, email);
+    });
+  }
+
+  function executeGoogleAuth(name, email) {
+    if (googleAuthLoading) googleAuthLoading.style.display = 'flex';
+    
+    // Simulate instantaneous Google OAuth verification handshake (600ms)
+    setTimeout(() => {
+      security.loginWithGoogleAccount(name, email);
+      closeGoogleAuth();
       syncAuthDisplay();
-    }
-  };
+    }, 600);
+  }
 
   // 7. Slide-Out Sidebar Drawer Controls
   function toggleSidebar(open) {
@@ -213,6 +297,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (closeSidebarBtn) closeSidebarBtn.addEventListener('click', () => toggleSidebar(false));
   if (sidebarBackdrop) sidebarBackdrop.addEventListener('click', () => toggleSidebar(false));
 
+  // Logout Button (Kept in slide-out sidebar)
   if (logoutBtn) {
     logoutBtn.addEventListener('click', () => {
       security.signOut();
@@ -292,7 +377,12 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      // Validate Authentication & Anti-Bot Quota
+      // Gate check: Must be authenticated
+      if (!security.isAuthenticated()) {
+        openGoogleAuthModal();
+        return;
+      }
+
       const validation = security.validateSubmission(engine.hasConfiguredKey());
       if (!validation.allowed) {
         alert(validation.reason);
@@ -306,22 +396,22 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!synapseConstellationObj) {
         synapseConstellationObj = new NeuralConstellation('synapseCanvas', { isSynapseMode: true });
       } else {
+        synapseConstellationObj.resetFadeIn();
         synapseConstellationObj.resize();
         synapseConstellationObj.start();
       }
 
-      // Progress and workflow phases
-      updateSynapsePhase(1, "The Architect is drafting first-principles framework & state invariants...", 25);
+      // Reset and initialize progress
+      updateSynapsePhase(1, "The Architect is drafting first-principles taxonomy & state invariants...", 25);
 
       const deliberationMessages = [];
       let arbiterResult = null;
 
-      // Minimum 2-second animation display promise
+      // Minimum 2-second animation display time enforced per user instruction
       const MIN_DISPLAY_MS = 2000;
-      const startTime = Date.now();
       const minDisplayPromise = new Promise(res => setTimeout(res, MIN_DISPLAY_MS));
 
-      // Deliberation execution promise
+      // Real-time AI Deliberation Execution
       const deliberationPromise = engine.deliberate({
         query: query || `Analyze attached research files: ${attachedFiles.map(f => f.name).join(', ')}`,
         files: attachedFiles.map(f => f.name),
@@ -329,34 +419,38 @@ document.addEventListener('DOMContentLoaded', () => {
           deliberationMessages.push(msg);
           if (msg.role_type === 'architect') {
             updateSynapsePhase(2, "The Skeptic is auditing adversarial boundary conditions...", 45);
+            if (synapseConstellationObj) synapseConstellationObj.emitPulse('architect', 'skeptic');
           } else if (msg.role_type === 'skeptic') {
             updateSynapsePhase(3, "The Verifier is proving algorithmic complexity & constraint soundness...", 70);
+            if (synapseConstellationObj) synapseConstellationObj.emitPulse('skeptic', 'verifier');
           } else if (msg.role_type === 'verifier') {
             updateSynapsePhase(4, "The Synthesizer is compiling unified dialectic resolution...", 88);
+            if (synapseConstellationObj) synapseConstellationObj.emitPulse('verifier', 'synthesizer');
           }
         },
         onArbiterEvaluation: (evalRes) => {
           arbiterResult = evalRes;
           currentDeliverable = evalRes.final_output || "";
           updateSynapsePhase(5, "The Arbiter is evaluating consensus & verifying final deliverable...", 100);
+          if (synapseConstellationObj) synapseConstellationObj.triggerArbiterConvergence(evalRes.verdict === 'APPROVED');
         }
       });
 
       try {
-        // Wait for BOTH deliberation AND at least 2 full seconds of synapse animation
+        // Wait for BOTH deliberation completion AND at least 2 full seconds of synapse animation
         const [delibData] = await Promise.all([deliberationPromise, minDisplayPromise]);
         
         currentDeliberationResult = delibData;
         security.recordDeliberation();
 
-        // Step B: Transition to Dedicated Output Page
+        // Step B: Transition to Output View
         setTimeout(() => {
           if (synapseConstellationObj) synapseConstellationObj.stop();
           synapseView.style.display = 'none';
           renderOutputView(delibData, deliberationMessages, arbiterResult);
           outputView.style.display = 'block';
           window.scrollTo({ top: 0, behavior: 'smooth' });
-        }, 300);
+        }, 400);
 
       } catch (err) {
         alert('Deliberation error: ' + err.message);
@@ -449,85 +543,78 @@ document.addEventListener('DOMContentLoaded', () => {
   // Export / Print PDF
   if (exportPdfBtn) {
     exportPdfBtn.addEventListener('click', () => {
-      exportDeliverablePDF(currentDeliverable);
+      window.print();
     });
   }
 
-  // Return to Console Button / New Deliberation Button
-  function returnToConsole() {
-    outputView.style.display = 'none';
-    mainView.style.display = 'block';
-    if (mainConstellationObj) mainConstellationObj.resize();
-    queryInput.value = '';
-    attachedFiles = [];
-    renderAttachedFiles();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-
-  if (backToConsoleBtn) backToConsoleBtn.addEventListener('click', returnToConsole);
-  if (newDeliberationBtn) newDeliberationBtn.addEventListener('click', returnToConsole);
-
-  // Chat with Arbiter on Output Page
-  if (chatSendBtn) chatSendBtn.addEventListener('click', sendUserChat);
-  if (chatInput) {
-    chatInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') sendUserChat();
+  // Return to Console
+  if (backToConsoleBtn) {
+    backToConsoleBtn.addEventListener('click', () => {
+      outputView.style.display = 'none';
+      mainView.style.display = 'block';
+      syncAuthDisplay();
     });
   }
 
-  function sendUserChat() {
-    const text = chatInput.value.trim();
-    if (!text) return;
-    chatInput.value = '';
+  if (newDeliberationBtn) {
+    newDeliberationBtn.addEventListener('click', () => {
+      queryInput.value = '';
+      attachedFiles = [];
+      renderAttachedFiles();
+      outputView.style.display = 'none';
+      mainView.style.display = 'block';
+      syncAuthDisplay();
+    });
+  }
 
-    const userBubble = document.createElement('div');
-    userBubble.className = 'chat-bubble user';
-    userBubble.innerHTML = `<strong>You:</strong> ${escapeHtml(text)}`;
-    chatHistory.appendChild(userBubble);
+  // 11. Interactive Dialogue with The Arbiter
+  if (chatSendBtn && chatInput) {
+    const handleChat = async () => {
+      const text = chatInput.value.trim();
+      if (!text) return;
+
+      appendChatBubble('user', text);
+      chatInput.value = '';
+
+      const typingId = appendChatBubble('arbiter', 'The Arbiter is analyzing your question against the consensus record...');
+
+      try {
+        const reply = await engine.chatWithArbiter(text, currentDeliberationResult);
+        const typingEl = document.getElementById(typingId);
+        if (typingEl) typingEl.innerHTML = `<strong>The Arbiter:</strong> ${escapeHtml(reply)}`;
+      } catch (err) {
+        const typingEl = document.getElementById(typingId);
+        if (typingEl) typingEl.innerHTML = `<strong>The Arbiter:</strong> ${escapeHtml(err.message)}`;
+      }
+    };
+
+    chatSendBtn.addEventListener('click', handleChat);
+    chatInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') handleChat();
+    });
+  }
+
+  let chatMsgIndex = 0;
+  function appendChatBubble(role, message) {
+    const id = `chat_msg_${chatMsgIndex++}`;
+    const bubble = document.createElement('div');
+    bubble.className = `chat-bubble ${role}`;
+    bubble.id = id;
+    bubble.innerHTML = role === 'arbiter' 
+      ? `<strong>The Arbiter:</strong> ${escapeHtml(message)}`
+      : `<strong>You:</strong> ${escapeHtml(message)}`;
+    chatHistory.appendChild(bubble);
     chatHistory.scrollTop = chatHistory.scrollHeight;
-
-    const thinking = document.createElement('div');
-    thinking.className = 'chat-bubble arbiter';
-    thinking.innerText = 'The Arbiter is analyzing inquiry...';
-    chatHistory.appendChild(thinking);
-
-    setTimeout(() => {
-      thinking.innerHTML = `<strong>The Arbiter:</strong> Regarding <em>"${escapeHtml(text)}"</em>: All verified assertions adhere to the formal invariant model. If you would like me to adjust parameters or re-generate specific modules, I can initiate a targeted council round.`;
-      chatHistory.scrollTop = chatHistory.scrollHeight;
-    }, 800);
-  }
-
-  function exportDeliverablePDF(content) {
-    const printWindow = window.open('', '_blank');
-    printWindow.document.write(`
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <title>Hive Verified Deliverable</title>
-        <style>
-          body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; line-height: 1.6; padding: 40px; color: #111; }
-          h1, h2, h3 { color: #0f172a; border-bottom: 1px solid #e2e8f0; padding-bottom: 6px; }
-          pre { background: #f8fafc; border: 1px solid #e2e8f0; padding: 16px; border-radius: 6px; white-space: pre-wrap; font-family: monospace; font-size: 13px; }
-          .badge { display: inline-block; padding: 6px 12px; background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; border-radius: 4px; font-size: 12px; font-weight: bold; margin-bottom: 20px; }
-        </style>
-      </head>
-      <body>
-        <div class="badge">VERIFIED &amp; APPROVED BY THE ARBITER • HIVE MULTI-MODEL COUNCIL</div>
-        <pre>${escapeHtml(content)}</pre>
-        <script>window.onload = function() { window.print(); };<\/script>
-      </body>
-      </html>
-    `);
-    printWindow.document.close();
+    return id;
   }
 
   function escapeHtml(str) {
-    if (!str) return '';
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;');
+    return (str || '').replace(/[&<>'"]/g, tag => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      "'": '&#39;',
+      '"': '&quot;'
+    }[tag] || tag));
   }
 });
