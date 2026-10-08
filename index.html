@@ -113,6 +113,9 @@
             <button class="btn btn-outline btn-sm" id="newChatHeaderBtn" title="Start a new chat or reset project">
               ➕ New Chat
             </button>
+            <button class="btn btn-outline btn-sm" id="gatewayModalBtn" title="Configure OmniRoute AI Gateway">
+              🌐 Gateway
+            </button>
             <button class="btn btn-danger btn-sm" id="endChatHeaderBtn" title="Cloud Burst: Reset project memory buffer">
               ⚡ END CHAT
             </button>
@@ -172,10 +175,15 @@
         </div>
 
         <!-- Readable Deliverable Content -->
-        <h4 style="margin-bottom: 12px; font-size: 15px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted);">
-          Verified Deliverable Output
-        </h4>
-        <div class="deliverable-content" id="deliverableContent"></div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <h4 style="margin: 0; font-size: 15px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted);">
+            Verified Deliverable Output
+          </h4>
+          <button class="btn btn-outline btn-xs" id="toggleViewFormatBtn" style="padding: 3px 10px; font-size: 11px;">
+            📄 Formatted View
+          </button>
+        </div>
+        <div class="deliverable-content formatted" id="deliverableContent"></div>
 
         <!-- ============================================================== -->
         <!-- INTERACTIVE ARBITER DELIBERATION & MODIFICATION CHAT WINDOW    -->
@@ -197,6 +205,7 @@
 
           <!-- Quick Intent Chips -->
           <div class="arbiter-quick-chips">
+            <button class="chip-btn" data-intent="read">📖 Where is the work? (Read Summary)</button>
             <button class="chip-btn" data-intent="status">🔍 Is the work done?</button>
             <button class="chip-btn" data-intent="modify">✏️ Request Changes / Modifications</button>
             <button class="chip-btn" data-intent="discuss">💬 Deliberate Deeper on Topic</button>
@@ -539,6 +548,37 @@
           <div id="adminTicketsList"></div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- Gateway Configuration Modal -->
+  <div class="modal-overlay" id="gatewayModal" style="display:none;">
+    <div class="modal-box" style="max-width: 500px;">
+      <div class="modal-header">
+        <h3 class="modal-title">🌐 OmniRoute &amp; AI Gateway</h3>
+        <button class="modal-close" id="closeGatewayModalBtn">&times;</button>
+      </div>
+      <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.6;">
+        Connect to a local or remote <strong>OmniRoute</strong> gateway (or any OpenAI-compatible API) to power the Council and Arbiter with live models like Claude 3.7 Sonnet, GPT-4o, and DeepSeek-R1.
+      </p>
+      
+      <div style="margin-bottom: 12px;">
+        <label class="support-label">Gateway Base URL</label>
+        <input type="text" id="gatewayUrlInput" class="support-input" placeholder="http://localhost:20128/v1" value="http://localhost:20128/v1">
+        <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Default OmniRoute dev server runs on port 20128.</div>
+      </div>
+
+      <div style="margin-bottom: 16px;">
+        <label class="support-label">API Key / Token (Optional)</label>
+        <input type="password" id="gatewayApiKeyInput" class="support-input" placeholder="sk_omniroute or custom key" value="sk_omniroute">
+      </div>
+
+      <div style="display: flex; gap: 10px; margin-bottom: 12px;">
+        <button class="btn btn-secondary" id="testGatewayBtn" style="flex: 1;">⚡ Test Connection</button>
+        <button class="btn btn-primary" id="saveGatewayBtn" style="flex: 1;">💾 Save Settings</button>
+      </div>
+
+      <div id="gatewayStatusNotice" style="display:none; padding: 10px 14px; border-radius: 6px; font-size: 13px; line-height: 1.5;"></div>
     </div>
   </div>
 

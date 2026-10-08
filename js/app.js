@@ -61,10 +61,21 @@ document.addEventListener('DOMContentLoaded', () => {
   const outputVerdictBadge = document.getElementById('outputVerdictBadge');
   const outputReasoningText = document.getElementById('outputReasoningText');
   const deliverableContent = document.getElementById('deliverableContent');
+  const toggleViewFormatBtn = document.getElementById('toggleViewFormatBtn');
   const downloadDeliverableBtn = document.getElementById('downloadDeliverableBtn');
   const copyDeliverableBtn = document.getElementById('copyDeliverableBtn');
   const exportPdfBtn = document.getElementById('exportPdfBtn');
   const newDeliberationBtn = document.getElementById('newDeliberationBtn');
+
+  // Gateway Modal & Controls
+  const gatewayModalBtn = document.getElementById('gatewayModalBtn');
+  const gatewayModal = document.getElementById('gatewayModal');
+  const closeGatewayModalBtn = document.getElementById('closeGatewayModalBtn');
+  const gatewayUrlInput = document.getElementById('gatewayUrlInput');
+  const gatewayApiKeyInput = document.getElementById('gatewayApiKeyInput');
+  const testGatewayBtn = document.getElementById('testGatewayBtn');
+  const saveGatewayBtn = document.getElementById('saveGatewayBtn');
+  const gatewayStatusNotice = document.getElementById('gatewayStatusNotice');
 
   // Arbiter Interactive Chat Card
   const arbiterChatCard = document.getElementById('arbiterChatCard');
@@ -484,7 +495,86 @@ document.addEventListener('DOMContentLoaded', () => {
     if (synapseBarFill) synapseBarFill.style.width = `${pct}%`;
   }
 
-  // 13. Render Deliverable Output
+  // 13. Markdown Formatter & HTML Sanitizer
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  function formatMarkdownToHtml(md) {
+    if (!md) return '';
+    let text = md
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+
+    text = text.replace(/^#### (.*$)/gim, '<h5 class="delib-h5">$1</h5>');
+    text = text.replace(/^### (.*$)/gim, '<h4 class="delib-h4">$1</h4>');
+    text = text.replace(/^## (.*$)/gim, '<h3 class="delib-h3">$1</h3>');
+    text = text.replace(/^# (.*$)/gim, '<h2 class="delib-h2">$1</h2>');
+
+    text = text.replace(/^---$/gim, '<hr class="delib-hr" />');
+
+    text = text.replace(/\*\*\*(.*?)\*\*\*/g, '<strong><em>$1</em></strong>');
+    text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
+
+    text = text.replace(/`([^`]+)`/g, '<code class="delib-code">$1</code>');
+    text = text.replace(/\$\$([^\$]+)\$\$/g, '<div class="delib-formula">$$$1$$</div>');
+    text = text.replace(/\$([^\$]+)\$/g, '<span class="delib-inline-formula">$1</span>');
+
+    text = text.replace(/^\|(.+)\|$/gim, (match) => {
+      const cells = match.split('|').slice(1, -1);
+      const isDivider = cells.every(c => c.trim().match(/^:?-+:?$/));
+      if (isDivider) return '<tr class="delib-tr-divider"></tr>';
+      const cellHtml = cells.map(c => `<td class="delib-td">${c.trim()}</td>`).join('');
+      return `<tr class="delib-tr">${cellHtml}</tr>`;
+    });
+    text = text.replace(/(<tr class="delib-tr">.*?<\/tr>(\s*<tr class="delib-tr-divider"><\/tr>)?)+/gis, (tbl) => {
+      return `<div class="delib-table-wrapper"><table class="delib-table">${tbl.replace(/<tr class="delib-tr-divider"><\/tr>/g, '')}</table></div>`;
+    });
+
+    text = text.replace(/^\s*[-*•]\s+(.*$)/gim, '<li class="delib-li">$1</li>');
+    text = text.replace(/^\s*(\d+)\.\s+(.*$)/gim, '<li class="delib-li-num" value="$1">$2</li>');
+
+    text = text.replace(/(<li class="delib-li">.*?<\/li>\s*)+/gis, '<ul class="delib-ul">$&</ul>');
+    text = text.replace(/(<li class="delib-li-num".*?<\/li>\s*)+/gis, '<ol class="delib-ol">$&</ol>');
+
+    const blocks = text.split(/\n{2,}/);
+    text = blocks.map(block => {
+      block = block.trim();
+      if (!block) return '';
+      if (block.startsWith('<h') || block.startsWith('<ul') || block.startsWith('<ol') || 
+          block.startsWith('<hr') || block.startsWith('<div') || block.startsWith('<table')) {
+        return block;
+      }
+      return `<p class="delib-p">${block.replace(/\n/g, '<br>')}</p>`;
+    }).filter(Boolean).join('\n');
+
+    return text;
+  }
+
+  // 14. Render Deliverable Output
+  let isFormattedView = true;
+
+  function updateDeliverableView() {
+    if (!deliverableContent) return;
+    if (isFormattedView) {
+      deliverableContent.innerHTML = formatMarkdownToHtml(currentDeliverable);
+      deliverableContent.classList.add('formatted');
+      if (toggleViewFormatBtn) toggleViewFormatBtn.innerText = "📄 Formatted View";
+    } else {
+      deliverableContent.innerText = currentDeliverable;
+      deliverableContent.classList.remove('formatted');
+      if (toggleViewFormatBtn) toggleViewFormatBtn.innerText = "📝 Raw Markdown";
+    }
+  }
+
   function renderDeliverable(fullResult, evalResult) {
     const evaluation = evalResult || (fullResult && fullResult.evaluation) || {
       verdict: "APPROVED",
@@ -503,9 +593,7 @@ document.addEventListener('DOMContentLoaded', () => {
       outputReasoningText.innerText = evaluation.reasoning || "Consensus verified by The Arbiter with project memory intact.";
     }
 
-    if (deliverableContent) {
-      deliverableContent.innerText = currentDeliverable;
-    }
+    updateDeliverableView();
 
     if (outputCard) {
       outputCard.classList.add('active');
@@ -513,18 +601,26 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // 14. Interactive Arbiter Consultation Chat Handlers
+  if (toggleViewFormatBtn) {
+    toggleViewFormatBtn.addEventListener('click', () => {
+      isFormattedView = !isFormattedView;
+      updateDeliverableView();
+    });
+  }
+
+  // 15. Interactive Arbiter Consultation Chat Handlers
   function resetArbiterChat() {
     if (!arbiterChatStream) return;
     arbiterChatStream.innerHTML = `
       <div class="arbiter-msg msg-arbiter">
         <div class="msg-sender">⚖️ The Arbiter</div>
         <div class="msg-bubble">
-          I have audited the Council's synthesis. You may consult with me directly:
+          I am The Arbiter, executive leader of the Multi-Model Frontier Council. I have audited our synthesis and am here to collaborate with you directly:
           <ul style="margin: 6px 0 0 18px;">
-            <li>Ask <strong>"Is the work done?"</strong> to evaluate completeness against all invariants.</li>
-            <li>Request <strong>modifications or changes</strong> to revise any section of the deliverable.</li>
-            <li>Conduct <strong>further technical discussion</strong> on this topic with full project memory.</li>
+            <li>Ask <strong>"Where is the work?"</strong> to get a complete executive walkthrough of the deliverable right here.</li>
+            <li>Ask <strong>"Is the work done?"</strong> to review completeness against all invariants and benchmarks.</li>
+            <li>Request <strong>modifications or additions</strong> to revise any part of the deliverable.</li>
+            <li>Ask <strong>in-depth questions</strong> about the topic, risks, valuation, or technical mechanics.</li>
           </ul>
         </div>
       </div>
@@ -553,7 +649,7 @@ document.addEventListener('DOMContentLoaded', () => {
     arbiterHistory.push({ role: 'user', content: text });
 
     // Typing bubble
-    const typingEl = appendArbiterMessage('arbiter', '⚖️ The Arbiter is auditing consensus...');
+    const typingEl = appendArbiterMessage('arbiter', '⚖️ The Arbiter is consulting...');
 
     try {
       const result = await engine.arbiterConsultation({
@@ -564,7 +660,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (typingEl) typingEl.remove();
 
-      let bubbleHtml = result.reply.replace(/\n/g, '<br>');
+      let bubbleHtml = formatMarkdownToHtml(result.reply);
       if (result.updatedDeliverable) {
         const btnId = `applyChangeBtn_${Date.now()}`;
         bubbleHtml += `<br><button class="apply-change-btn" id="${btnId}">✨ Apply to Deliverable</button>`;
@@ -578,7 +674,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (btn) {
           btn.addEventListener('click', () => {
             currentDeliverable = result.updatedDeliverable;
-            if (deliverableContent) deliverableContent.innerText = currentDeliverable;
+            updateDeliverableView();
             btn.innerText = "✅ Changes Applied to Deliverable!";
             btn.disabled = true;
           });
@@ -604,7 +700,10 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.arbiter-quick-chips .chip-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const intent = btn.getAttribute('data-intent');
-      if (intent === 'status') {
+      if (intent === 'read') {
+        if (arbiterMsgInput) arbiterMsgInput.value = "Where is the work? Please provide a detailed summary and walkthrough of the deliverable.";
+        handleArbiterSend();
+      } else if (intent === 'status') {
         if (arbiterMsgInput) arbiterMsgInput.value = "Is the work done or not? Please evaluate completeness against all invariants.";
         handleArbiterSend();
       } else if (intent === 'modify') {
@@ -613,14 +712,69 @@ document.addEventListener('DOMContentLoaded', () => {
           arbiterMsgInput.focus();
         }
       } else if (intent === 'discuss') {
-        if (arbiterMsgInput) arbiterMsgInput.value = "Let's deliberate deeper on the theoretical nuances and key implementation tradeoffs.";
+        if (arbiterMsgInput) arbiterMsgInput.value = "Let's deliberate deeper on the key trade-offs and domain mechanics.";
         handleArbiterSend();
       } else if (intent === 'audit') {
-        if (arbiterMsgInput) arbiterMsgInput.value = "Conduct an adversarial audit on boundary failure modes.";
+        if (arbiterMsgInput) arbiterMsgInput.value = "Conduct an adversarial audit on boundary failure modes and critical risks.";
         handleArbiterSend();
       }
     });
   });
+
+  // 16. Gateway Settings Modal Handlers
+  function openGatewayModal() {
+    if (gatewayUrlInput) gatewayUrlInput.value = engine.localGatewayUrl;
+    if (gatewayApiKeyInput) gatewayApiKeyInput.value = engine.gatewayApiKey;
+    if (gatewayStatusNotice) gatewayStatusNotice.style.display = 'none';
+    if (gatewayModal) gatewayModal.style.display = 'flex';
+  }
+
+  function closeGatewayModal() {
+    if (gatewayModal) gatewayModal.style.display = 'none';
+  }
+
+  if (gatewayModalBtn) gatewayModalBtn.addEventListener('click', openGatewayModal);
+  if (closeGatewayModalBtn) closeGatewayModalBtn.addEventListener('click', closeGatewayModal);
+
+  if (testGatewayBtn) {
+    testGatewayBtn.addEventListener('click', async () => {
+      const url = (gatewayUrlInput && gatewayUrlInput.value.trim()) || "http://localhost:20128/v1";
+      const key = (gatewayApiKeyInput && gatewayApiKeyInput.value.trim()) || "sk_omniroute";
+      engine.setGatewayUrl(url, key);
+      testGatewayBtn.innerText = "Testing...";
+      testGatewayBtn.disabled = true;
+
+      const health = await engine.checkGatewayHealth();
+      testGatewayBtn.innerText = "⚡ Test Connection";
+      testGatewayBtn.disabled = false;
+
+      if (gatewayStatusNotice) {
+        gatewayStatusNotice.style.display = 'block';
+        if (health.online) {
+          gatewayStatusNotice.style.background = 'rgba(16, 185, 129, 0.15)';
+          gatewayStatusNotice.style.border = '1px solid #10b981';
+          gatewayStatusNotice.style.color = '#34d399';
+          gatewayStatusNotice.innerHTML = `✅ <strong>Connected!</strong> OmniRoute gateway active at <code>${health.url}</code>. Council will use live frontier models.`;
+        } else {
+          gatewayStatusNotice.style.background = 'rgba(239, 68, 68, 0.15)';
+          gatewayStatusNotice.style.border = '1px solid #ef4444';
+          gatewayStatusNotice.style.color = '#f87171';
+          gatewayStatusNotice.innerHTML = `⚠️ <strong>Gateway Offline.</strong> Could not reach <code>${url}</code>. Built-in neural reasoning engine will handle deliberations.`;
+        }
+      }
+      syncAuthState();
+    });
+  }
+
+  if (saveGatewayBtn) {
+    saveGatewayBtn.addEventListener('click', () => {
+      const url = (gatewayUrlInput && gatewayUrlInput.value.trim()) || "http://localhost:20128/v1";
+      const key = (gatewayApiKeyInput && gatewayApiKeyInput.value.trim()) || "sk_omniroute";
+      engine.setGatewayUrl(url, key);
+      syncAuthState();
+      closeGatewayModal();
+    });
+  }
 
   // 15. Support Modal & Admin Resolution Desk
   function openSupportModal() {
