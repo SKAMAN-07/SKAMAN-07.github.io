@@ -564,6 +564,17 @@
         Connect to a local or remote <strong>OmniRoute</strong> gateway (or any OpenAI-compatible API) to power the Council and Arbiter with live models like Claude 3.7 Sonnet, GPT-4o, and DeepSeek-R1.
       </p>
       
+      <div style="margin-bottom: 14px;">
+        <label class="support-label" style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 6px;">
+          <span>Quick Endpoint Presets:</span>
+        </label>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button type="button" class="btn btn-outline btn-xs" id="presetOmniRouteBtn">⚡ OmniRoute (:20128)</button>
+          <button type="button" class="btn btn-outline btn-xs" id="presetOpenRouterBtn">🌐 OpenRouter (HTTPS)</button>
+          <button type="button" class="btn btn-outline btn-xs" id="presetOllamaBtn">🦙 Ollama (:11434)</button>
+        </div>
+      </div>
+
       <div style="margin-bottom: 12px;">
         <label class="support-label">Gateway Base URL</label>
         <input type="text" id="gatewayUrlInput" class="support-input" placeholder="http://localhost:20128/v1" value="http://localhost:20128/v1">
@@ -578,6 +589,7 @@
           <option value="gpt-4o-mini">gpt-4o-mini (OpenAI Fast)</option>
           <option value="deepseek-r1">deepseek-r1 (DeepSeek Reasoning)</option>
           <option value="claude-3-7-sonnet">claude-3-7-sonnet (Claude 3.7 Sonnet)</option>
+          <option value="llama3.2">llama3.2 (Ollama Local / Meta LLaMA 3.2)</option>
           <option value="mistral">mistral (Mistral AI)</option>
         </select>
         <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">'auto' connects out-of-the-box with OmniRoute's built-in keyless providers.</div>

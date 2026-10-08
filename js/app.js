@@ -77,6 +77,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const testGatewayBtn = document.getElementById('testGatewayBtn');
   const saveGatewayBtn = document.getElementById('saveGatewayBtn');
   const gatewayStatusNotice = document.getElementById('gatewayStatusNotice');
+  const presetOmniRouteBtn = document.getElementById('presetOmniRouteBtn');
+  const presetOpenRouterBtn = document.getElementById('presetOpenRouterBtn');
+  const presetOllamaBtn = document.getElementById('presetOllamaBtn');
 
   // Arbiter Interactive Chat Card
   const arbiterChatCard = document.getElementById('arbiterChatCard');
@@ -739,6 +742,38 @@ document.addEventListener('DOMContentLoaded', () => {
   if (gatewayModalBtn) gatewayModalBtn.addEventListener('click', openGatewayModal);
   if (closeGatewayModalBtn) closeGatewayModalBtn.addEventListener('click', closeGatewayModal);
 
+  if (presetOmniRouteBtn) {
+    presetOmniRouteBtn.addEventListener('click', () => {
+      if (gatewayUrlInput) gatewayUrlInput.value = 'http://localhost:20128/v1';
+      if (gatewayModelSelect) gatewayModelSelect.value = 'auto';
+      if (gatewayApiKeyInput) gatewayApiKeyInput.value = 'sk_omniroute';
+      if (gatewayStatusNotice) gatewayStatusNotice.style.display = 'none';
+    });
+  }
+
+  if (presetOpenRouterBtn) {
+    presetOpenRouterBtn.addEventListener('click', () => {
+      if (gatewayUrlInput) gatewayUrlInput.value = 'https://openrouter.ai/api/v1';
+      if (gatewayModelSelect) gatewayModelSelect.value = 'openrouter/free';
+      if (gatewayApiKeyInput) {
+        if (!gatewayApiKeyInput.value || gatewayApiKeyInput.value === 'sk_omniroute' || gatewayApiKeyInput.value === 'ollama') {
+          gatewayApiKeyInput.value = '';
+          gatewayApiKeyInput.placeholder = 'Paste OpenRouter Key (sk-or-...)';
+        }
+      }
+      if (gatewayStatusNotice) gatewayStatusNotice.style.display = 'none';
+    });
+  }
+
+  if (presetOllamaBtn) {
+    presetOllamaBtn.addEventListener('click', () => {
+      if (gatewayUrlInput) gatewayUrlInput.value = 'http://localhost:11434/v1';
+      if (gatewayModelSelect) gatewayModelSelect.value = 'llama3.2';
+      if (gatewayApiKeyInput) gatewayApiKeyInput.value = 'ollama';
+      if (gatewayStatusNotice) gatewayStatusNotice.style.display = 'none';
+    });
+  }
+
   if (testGatewayBtn) {
     testGatewayBtn.addEventListener('click', async () => {
       const url = (gatewayUrlInput && gatewayUrlInput.value.trim()) || "http://localhost:20128/v1";
@@ -758,12 +793,13 @@ document.addEventListener('DOMContentLoaded', () => {
           gatewayStatusNotice.style.background = 'rgba(16, 185, 129, 0.15)';
           gatewayStatusNotice.style.border = '1px solid #10b981';
           gatewayStatusNotice.style.color = '#34d399';
-          gatewayStatusNotice.innerHTML = `✅ <strong>Connected!</strong> OmniRoute gateway active at <code>${health.url}</code> (Model: <code>${model}</code>). Deliberations and Arbiter chat will use live models.`;
+          gatewayStatusNotice.innerHTML = `✅ <strong>Connected!</strong> AI gateway active at <code>${health.url}</code> (Model: <code>${model}</code>). Deliberations and Arbiter chat will use live models.`;
         } else {
           gatewayStatusNotice.style.background = 'rgba(239, 68, 68, 0.15)';
           gatewayStatusNotice.style.border = '1px solid #ef4444';
           gatewayStatusNotice.style.color = '#f87171';
-          gatewayStatusNotice.innerHTML = `⚠️ <strong>Gateway Offline or Blocked by Browser.</strong> Could not reach <code>${url}</code>. Built-in neural reasoning engine will handle deliberations and chat with zero interruption.`;
+          const reasonHtml = health.reason ? `<div style="margin-top: 6px; font-size: 12px; color: #fca5a5; line-height: 1.4;">${health.reason}</div>` : '';
+          gatewayStatusNotice.innerHTML = `⚠️ <strong>Gateway Offline or Blocked by Browser.</strong> Could not reach <code>${url}</code>.${reasonHtml}<div style="margin-top: 6px; font-size: 11px; opacity: 0.85;">Built-in high-capacity neural reasoning engine will handle deliberations and chat with zero interruption.</div>`;
         }
       }
       syncAuthState();

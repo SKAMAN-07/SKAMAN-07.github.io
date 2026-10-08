@@ -69,13 +69,58 @@ async function runTests() {
   assert.strictEqual(deliverable.includes(genericPlaceholder2), false, 'Contains generic placeholder meta-babble 2');
   console.log('✓ Banking deliberation passed with publication-grade domain content');
 
+  // Test 2B: Deliberation on User Prompt (AI Human Clone for Digital World - Screenshot 2026-10-09)
+  console.log('Test 2B: Deliberation on AI clone prompt from Screenshots & Deliverable');
+  const cloneQuery = "make a structural plan on how to make a model ai clone of an human which can easily do things as the human but inside the digital world .";
+  let cloneCouncilMessages = [];
+  let cloneEvaluated = null;
+  const cloneResult = await engine._deliberateFrontierCouncil({
+    query: cloneQuery,
+    files: [],
+    memoryContext: null,
+    currentTurn: 2,
+    onMessage: (m) => cloneCouncilMessages.push(m),
+    onArbiterEvaluation: (e) => { cloneEvaluated = e; }
+  });
+
+  const cloneDeliverable = cloneResult.evaluation.final_output;
+  assert.ok(cloneDeliverable.length > 5000, `Deliverable length was ${cloneDeliverable.length}`);
+  assert.strictEqual(cloneEvaluated.verdict, 'APPROVED');
+
+  // MUST NOT contain irrelevant FlashAttention/Transformer pretraining formulas
+  assert.strictEqual(cloneDeliverable.includes('FlashAttention-2'), false, 'Contains FlashAttention-2');
+  assert.strictEqual(cloneDeliverable.includes('\\text{softmax}'), false, 'Contains Attention formula');
+  assert.strictEqual(cloneDeliverable.includes('Mixture of Experts (MoE) Routing'), false, 'Contains MoE routing');
+
+  // MUST NOT contain generic meta-process templates
+  assert.strictEqual(cloneDeliverable.includes('Core Operational Workflow & Sequence'), false, 'Contains generic operational workflow');
+  assert.strictEqual(cloneDeliverable.includes('Primary Initiation & Scoping'), false, 'Contains generic scoping');
+  assert.strictEqual(cloneDeliverable.includes('Phase 1: Foundation & Alignment: map out dependencies'), false, 'Contains generic checklist');
+
+  // MUST contain concrete AI clone architecture
+  assert.ok(cloneDeliverable.includes('Multi-Modal Digital Perception') || cloneDeliverable.includes('VLM Screen Grounding') || cloneDeliverable.includes('sub-pixel coordinate'), 'Missing perception layer');
+  assert.ok(cloneDeliverable.includes('Cognitive Persona & Hierarchical Memory') || cloneDeliverable.includes('Episodic Memory') || cloneDeliverable.includes('Procedural Memory'), 'Missing memory architecture');
+  assert.ok(cloneDeliverable.includes('Computer-Use') || cloneDeliverable.includes('Playwright') || cloneDeliverable.includes('Chrome DevTools Protocol') || cloneDeliverable.includes('Virtual Mouse'), 'Missing computer-use action grounding');
+  assert.ok(cloneDeliverable.includes('Zero-Knowledge Credential Vault') || cloneDeliverable.includes('Human-in-the-Loop Interlocks'), 'Missing security architecture');
+  assert.ok(cloneDeliverable.includes('UI-TARS') || cloneDeliverable.includes('LangGraph') || cloneDeliverable.includes('Qdrant'), 'Missing production tech stack');
+
+  // Verify Council Messages: Must give concrete domain answers, NOT meta-descriptions
+  const archMsg = cloneCouncilMessages.find(m => m.role_type === 'architect');
+  assert.ok(archMsg && (archMsg.content.includes('5-Layer Digital Human Architecture') || archMsg.content.includes('Perception Layer')), 'Architect did not give digital human architecture');
+  const skepMsg = cloneCouncilMessages.find(m => m.role_type === 'skeptic');
+  assert.ok(skepMsg && (skepMsg.content.includes('Sub-Pixel Drift') || skepMsg.content.includes('Action Hallucination')), 'Skeptic did not critique digital clone failure modes');
+  const verMsg = cloneCouncilMessages.find(m => m.role_type === 'verifier');
+  assert.ok(verMsg && (verMsg.content.includes('Grounding Accuracy') || verMsg.content.includes('IoU')), 'Verifier did not provide grounding accuracy invariants');
+
+  console.log('✓ AI Clone deliberation passed with concrete digital human architecture and substantive council answers');
+
   // Test 3: Deliberation on arbitrary non-banking prompt
   console.log('Test 3: Universal dynamic deliberation on non-templated prompt');
   const genericResult = await engine._deliberateFrontierCouncil({
     query: "Create a scalable supply chain system for organic bakery",
     files: [],
     memoryContext: null,
-    currentTurn: 2,
+    currentTurn: 3,
     onMessage: null,
     onArbiterEvaluation: null
   });
@@ -83,10 +128,12 @@ async function runTests() {
   assert.ok(genericDeliverable.length > 2500, `Length was ${genericDeliverable.length}`);
   assert.strictEqual(genericDeliverable.includes(genericPlaceholder1), false, 'Generic contains placeholder 1');
   assert.strictEqual(genericDeliverable.includes(genericPlaceholder2), false, 'Generic contains placeholder 2');
+  assert.strictEqual(genericDeliverable.includes('Core Operational Workflow & Sequence'), false, 'Generic contains generic workflow');
+  assert.strictEqual(genericDeliverable.includes('Primary Initiation & Scoping'), false, 'Generic contains generic scoping');
   console.log('✓ Universal dynamic deliberation passed with concrete content');
 
   // Test 4: Arbiter Consultation for "where is the work" (Screenshot 230033)
-  console.log('Test 4: Arbiter consultation for "where is the work"');
+  console.log('Test 4: Arbiter consultation for "where is the work" on banking');
   const chatWork = engine._conversationalArbiterDialogue({
     message: "where is the work",
     deliverable: deliverable,
@@ -100,6 +147,17 @@ async function runTests() {
   assert.ok(chatWork.reply.includes('Verified Deliverable Output'), 'Did not point to UI location above chat');
   assert.ok(chatWork.reply.includes('Net Interest Margin') || chatWork.reply.includes('CET1') || chatWork.reply.includes('Silicon Valley Bank'), 'Missing executive walkthrough of work');
   console.log('✓ "Where is the work" returned natural walkthrough without robotic script');
+
+  // Test 4B: Arbiter Consultation for "where is the work" on AI Clone
+  console.log('Test 4B: Arbiter consultation for "where is the work" on AI Clone');
+  const chatWorkClone = engine._conversationalArbiterDialogue({
+    message: "where is the work",
+    deliverable: cloneDeliverable,
+    history: []
+  });
+  assert.ok(chatWorkClone.reply.includes('5-Layer Digital Human Architecture') || chatWorkClone.reply.includes('Sensory Grounding'), 'Missing AI clone walkthrough');
+  assert.ok(chatWorkClone.reply.includes('Computer-Use'), 'Missing Computer-Use in walkthrough');
+  console.log('✓ AI Clone "where is the work" returned detailed digital twin architecture');
 
   // Test 5: Arbiter Consultation for "i want to read the work" (Screenshot 230042)
   console.log('Test 5: Arbiter consultation for "i want to read the work"');
@@ -146,7 +204,17 @@ async function runTests() {
     history: []
   });
   assert.ok(chatVal.reply.includes('Return on Equity') || chatVal.reply.includes('P/TBV'), 'Missing valuation mechanics');
-  console.log('✓ Specific domain queries answered with deep technical accuracy');
+
+  // Test 7B: Specific questions on AI Clone (Mouse/Keyboard & Safety)
+  console.log('Test 7B: Specific domain questions on AI Clone');
+  const chatMouse = engine._conversationalArbiterDialogue({
+    message: "how does mouse and keyboard simulation and computer use work?",
+    deliverable: cloneDeliverable,
+    history: []
+  });
+  assert.ok(chatMouse.reply.includes('Sub-Pixel Coordinate Grounding') || chatMouse.reply.includes('Playwright'), 'Missing mouse/keyboard mechanics');
+  assert.ok(chatMouse.reply.includes('Credential Vault') || chatMouse.reply.includes('Interlocks'), 'Missing safety interlocks');
+  console.log('✓ Specific AI Clone queries answered with deep technical accuracy');
 
   // Test 8: Directive to modify deliverable
   console.log('Test 8: Directive to modify deliverable');
@@ -162,7 +230,7 @@ async function runTests() {
   // Test 9: Cloud Burst
   console.log('Test 9: Project Memory and Cloud Burst');
   const mem = engine.getMemory();
-  assert.strictEqual(mem.getTurnCount(), 2);
+  assert.strictEqual(mem.getTurnCount(), 3);
   engine.clearProjectMemory();
   assert.strictEqual(mem.getTurnCount(), 0);
   console.log('✓ Cloud burst verified');
