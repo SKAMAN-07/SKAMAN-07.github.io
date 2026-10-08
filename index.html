@@ -7,430 +7,384 @@
   <link rel="stylesheet" href="css/style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
 </head>
 <body>
 
   <!-- ============================================================== -->
-  <!-- 1. LANDING VIEW: Canva SVG Slides & Anthropic-Style Live View  -->
+  <!-- 1. EDITORIAL NAVIGATION BAR                                    -->
   <!-- ============================================================== -->
-  <div id="landingView" class="view-section landing-view">
-    <!-- Ambient Starlight Canvas for Anthropic-Style Live Atmosphere -->
-    <canvas id="landingCanvas" class="landing-ambient-canvas"></canvas>
-
-    <!-- Top Navigation Bar -->
-    <header class="landing-nav">
-      <div class="logo-group">
-        <span class="logo-icon">⚡</span>
-        <span class="logo-text">HIVE</span>
-        <span class="chip chip-dim">AIS MESH</span>
+  <nav class="navbar">
+    <div class="container navbar-inner">
+      <div class="brand-group" id="brandLogoBtn">
+        <span class="brand-logo-icon">⚡</span>
+        <span class="brand-title">HIVE</span>
+        <span class="brand-tag">AIS MESH</span>
       </div>
-      <div class="landing-nav-right">
-        <button class="btn btn-secondary btn-sm" id="navJumpLoginBtn">
-          <svg class="google-logo-sm" viewBox="0 0 24 24" width="16" height="16">
+
+      <ul class="nav-links">
+        <li><a class="nav-link" href="#overview" id="navLinkOverview">Overview</a></li>
+        <li><a class="nav-link" href="#playground" id="navLinkPlayground">Playground</a></li>
+        <li><a class="nav-link" href="#council" id="navLinkCouncil">Council</a></li>
+        <li><a class="nav-link" href="#architecture" id="navLinkArchitecture">Architecture</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <!-- Google Sign-In Trigger (Unauthenticated) -->
+        <button class="btn btn-secondary btn-sm" id="navAuthBtn">
+          <svg viewBox="0 0 24 24" width="16" height="16">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
             <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
             <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
             <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
           </svg>
-          <span>Sign In with Google</span>
+          <span id="navAuthBtnText">Sign In with Google</span>
+        </button>
+
+        <!-- Sidebar / Account Drawer Toggle Button -->
+        <button class="btn btn-secondary btn-sm" id="sidebarToggleBtn" title="Menu & Settings">
+          <span id="navAvatarBadge" class="pill-dot" style="display:none;"></span>
+          <span>Menu ☰</span>
         </button>
       </div>
-    </header>
-
-    <!-- 3-Slide Carousel Viewport -->
-    <div class="carousel-viewport" id="carouselViewport">
-      <div class="carousel-track" id="carouselTrack">
-        
-        <!-- SLIDE 1: Canva Presentation Slide 1 -->
-        <section class="carousel-slide" id="slide1">
-          <div class="slide-inner">
-            <div class="slide-canva-frame">
-              <img src="img/hive_slide1.svg" alt="HIVE AIS MESH - Canva Page 1" class="canva-slide-img">
-            </div>
-
-            <div class="slide-controls-bar">
-              <button class="btn btn-primary btn-glow btn-lg" id="readMoreBtn">
-                Read More &amp; Explore &rarr;
-              </button>
-            </div>
-          </div>
-        </section>
-
-        <!-- SLIDE 2: Canva Presentation Slide 2 -->
-        <section class="carousel-slide" id="slide2">
-          <div class="slide-inner">
-            <div class="slide-canva-frame">
-              <img src="img/hive_slide2.svg" alt="HIVE AIS MESH - Deliberation Mechanics" class="canva-slide-img">
-            </div>
-
-            <div class="slide-controls-bar">
-              <button class="btn btn-secondary" id="slide2BackBtn">&larr; Back to Overview</button>
-              <button class="btn btn-primary" id="slide2NextBtn">Proceed to Arbiter Gate &rarr;</button>
-            </div>
-          </div>
-        </section>
-
-        <!-- SLIDE 3: Canva Presentation Slide 3 with Interactive Google Login -->
-        <section class="carousel-slide" id="slide3">
-          <div class="slide-inner">
-            <div class="slide-canva-frame" id="slide3Frame">
-              <img src="img/hive_slide3.svg" alt="HIVE AIS MESH - Authentication Gate" class="canva-slide-img">
-              
-              <!-- Hotspot placed directly over Canva's "Login with Google" button -->
-              <button class="canva-google-hotspot" id="canvaGoogleHotspot" title="Click to Sign in with Google" aria-label="Sign in with Google">
-                <span class="hotspot-pulse"></span>
-                <span class="hotspot-halo"></span>
-              </button>
-            </div>
-
-            <div class="slide-controls-bar slide3-footer-bar">
-              <button class="btn btn-secondary btn-sm" id="slide3BackBtn">&larr; Back to Mechanics</button>
-              
-              <!-- Explicit Interactive Google Login Button for full accessibility -->
-              <button class="google-btn google-btn-lg" id="slide3GoogleBtn">
-                <svg class="google-logo" viewBox="0 0 24 24" width="22" height="22">
-                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
-                </svg>
-                <span>Sign in with Google to enter Hive</span>
-              </button>
-            </div>
-          </div>
-        </section>
-
-      </div>
     </div>
-
-    <!-- Carousel Dots Navigation -->
-    <div class="carousel-dots" id="carouselDots">
-      <button class="dot active" data-slide="0" aria-label="Slide 1: Overview">
-        <span class="dot-label">1. Overview</span>
-      </button>
-      <button class="dot" data-slide="1" aria-label="Slide 2: Mechanics">
-        <span class="dot-label">2. Mechanics</span>
-      </button>
-      <button class="dot" data-slide="2" aria-label="Slide 3: Arbiter Gate">
-        <span class="dot-label">3. Arbiter Gate</span>
-      </button>
-    </div>
-  </div>
-
+  </nav>
 
   <!-- ============================================================== -->
-  <!-- INTERACTIVE GOOGLE AUTHENTICATION MODAL                        -->
-  <!-- Resolves WhatsApp Error 401: invalid_client with zero lockouts  -->
+  <!-- 2. ANTHROPIC-STYLE EDITORIAL HERO SECTION                      -->
   <!-- ============================================================== -->
-  <div class="google-oauth-modal" id="googleAuthModal" style="display:none;">
-    <div class="google-oauth-backdrop" id="googleAuthBackdrop"></div>
-    <div class="google-oauth-card">
-      <div class="google-oauth-header">
-        <svg class="google-logo" viewBox="0 0 24 24" width="32" height="32">
-          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
-        </svg>
-        <h3>Sign in with Google</h3>
-        <p>Choose an account to continue to <strong>HIVE AIS MESH</strong></p>
+  <header class="hero-section" id="overview">
+    <canvas id="heroCanvas" class="hero-canvas"></canvas>
+
+    <div class="container hero-content">
+      <div class="pill-badge">
+        <span class="pill-dot"></span>
+        <span>Consensus Mesh v2.0 • Zero Host Burden Architecture</span>
       </div>
 
-      <!-- Account Selection List -->
-      <div class="google-account-list">
-        <!-- User Primary Account (from WhatsApp screenshot) -->
-        <div class="google-account-item" id="googleAccountPrimary">
-          <div class="google-account-avatar">A</div>
-          <div class="google-account-info">
-            <div class="google-account-name">Akmal (SKAMAN)</div>
-            <div class="google-account-email">2022abircoc@gmail.com</div>
-            <div class="google-account-badge">Signed in on this device</div>
-          </div>
-          <div class="google-account-arrow">&rarr;</div>
-        </div>
+      <h1 class="hero-headline">
+        Frontier AI deliberation,<br>
+        <span class="accent">governed by The Arbiter.</span>
+      </h1>
 
-        <!-- Custom Account Selector Trigger -->
-        <div class="google-account-item google-account-item-alt" id="googleAccountCustom">
-          <div class="google-account-avatar alt">+</div>
-          <div class="google-account-info">
-            <div class="google-account-name">Use another Google account</div>
-            <div class="google-account-email">Sign in with a different name or email</div>
-          </div>
-        </div>
-      </div>
+      <p class="hero-subtitle">
+        An autonomous 5-node neural mesh where frontier models debate in parallel, stress-test adversarial splits, and synthesize verified, publication-grade deliverables.
+      </p>
 
-      <!-- Custom Account Input Drawer -->
-      <div class="google-custom-account-box" id="googleCustomAccountBox" style="display:none;">
-        <input type="text" id="customUserNameInput" placeholder="Your Name (e.g. Hive Researcher)" class="google-input">
-        <input type="email" id="customUserEmailInput" placeholder="Gmail Address (e.g. researcher@gmail.com)" class="google-input" style="margin-top:8px;">
-        <button class="btn btn-primary btn-sm" id="customUserLoginBtn" style="margin-top:10px; width:100%;">
-          Continue with this Account
+      <div class="hero-cta-group">
+        <button class="btn btn-primary btn-lg" id="heroLaunchBtn">
+          ⚡ Launch Deliberation Console &rarr;
+        </button>
+        <button class="btn btn-secondary btn-lg" id="heroAuthBtn">
+          Sign In with Google
         </button>
       </div>
 
-      <!-- Authenticating Spinner Overlay -->
-      <div class="google-auth-loading" id="googleAuthLoading" style="display:none;">
-        <div class="google-spinner"></div>
-        <span>Verifying Google Identity Token &amp; Anti-Bot Shield...</span>
-      </div>
-
-      <div class="google-oauth-footer">
-        <span>Zero OAuth 401 Errors • Direct Secure Token Handshake</span>
-        <button class="btn btn-secondary btn-sm" id="closeGoogleAuthModal">Cancel</button>
+      <div class="hero-specs-row">
+        <span>🔒 Zero Host Compute Burden</span>
+        <span>•</span>
+        <span>⚡ 60 FPS Procedural Synapses</span>
+        <span>•</span>
+        <span>⚖️ Executive Arbiter Verification</span>
       </div>
     </div>
-  </div>
-
+  </header>
 
   <!-- ============================================================== -->
-  <!-- 2. MAIN HIVE HUD VIEW: Streamlined (Constellation + Input)     -->
+  <!-- 3. INTERACTIVE DELIBERATION PLAYGROUND (CORE EXPERIENCE)       -->
   <!-- ============================================================== -->
-  <div id="mainView" class="view-section main-view" style="display:none;">
+  <section class="playground-section" id="playground">
     <div class="container">
-      
-      <!-- Streamlined Header HUD -->
-      <header class="hud-header">
-        <div class="logo-group">
-          <span class="logo-icon">⚡</span>
-          <span class="logo-text">HIVE</span>
-          <span class="chip chip-status">
-            <span class="chip-dot"></span>
-            Mesh Ready
-          </span>
+      <div class="console-container">
+        
+        <!-- Console Header & Council Telemetry Badges -->
+        <div class="console-header">
+          <div class="console-title-group">
+            <span style="font-size: 20px;">⚡</span>
+            <h2 style="font-size: 20px;">Deliberation Console</h2>
+          </div>
+
+          <div class="council-telemetry-strip">
+            <div class="telemetry-node node-arbiter">
+              <span class="node-dot"></span>
+              <span>Arbiter (Executive)</span>
+            </div>
+            <div class="telemetry-node node-architect">
+              <span class="node-dot"></span>
+              <span>Architect</span>
+            </div>
+            <div class="telemetry-node node-skeptic">
+              <span class="node-dot"></span>
+              <span>Skeptic</span>
+            </div>
+            <div class="telemetry-node node-verifier">
+              <span class="node-dot"></span>
+              <span>Verifier</span>
+            </div>
+            <div class="telemetry-node node-synthesizer">
+              <span class="node-dot"></span>
+              <span>Synthesizer</span>
+            </div>
+          </div>
         </div>
 
-        <div class="hud-actions">
-          <span class="chip" id="quotaText">5/5 Daily Free</span>
-          <!-- Slide-out Drawer Trigger Button -->
-          <button class="btn btn-secondary btn-icon" id="sidebarToggleBtn" title="Account & Settings">
-            <span id="userAvatarSmall" class="avatar-circle">A</span>
-            <span>Menu ☰</span>
-          </button>
-        </div>
-      </header>
-
-      <!-- Real-Time Neural Constellation Canvas (Clean & Focused) -->
-      <div class="constellation-viewport">
-        <div class="constellation-hud-overlay">
-          <span>TOPOLOGY: 5-WAY CONSENSUS MESH</span>
-          <span>•</span>
-          <span>LATENCY: 12ms</span>
-          <span>•</span>
-          <span>SYNAPSE: ACTIVE</span>
-        </div>
-        <canvas id="neuralCanvas"></canvas>
-      </div>
-
-      <!-- User Input & File Upload Console (Zero Clutter) -->
-      <div class="console-card">
-        <!-- Universal Drag & Drop File Zone -->
-        <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+        <!-- Universal File Ingestion Dropzone -->
+        <div class="dropzone" id="dropzone">
           <input type="file" id="fileInput" multiple style="display:none;">
-          <div class="drop-title">
-            📁 Drop or Click to Attach Research Files (Unrestricted: Any Type)
-          </div>
-          <div class="drop-desc">
-            Attach code, PDFs, Word docs, data spreadsheets, research notes, or system blueprints
-          </div>
+          <div class="dropzone-icon">📁</div>
+          <div class="dropzone-title">Drop research files here, or click to browse</div>
+          <div class="dropzone-subtitle">Attach source code, PDFs, Word docs, spreadsheets, or system blueprints (unrestricted)</div>
         </div>
-        <div id="attachedFilesContainer" class="attached-files-container"></div>
+        <div class="attached-chips" id="attachedChipsContainer"></div>
 
-        <!-- Query Input Window -->
-        <textarea id="queryInput" placeholder="Enter problem, mission, or blueprint for cross-model deliberation (e.g. 'Audit this system blueprint for failure modes', 'Prove algorithmic correctness under adversarial split')..."></textarea>
+        <!-- Mission / Prompt Query Box -->
+        <textarea 
+          class="prompt-box" 
+          id="queryInput" 
+          placeholder="Enter problem, mission, or blueprint for cross-model deliberation (e.g. 'Audit this distributed consensus architecture for Byzantine split failure modes', 'Prove algorithmic correctness under network latency spikes')..."
+        ></textarea>
 
-        <!-- Submit Action Bar -->
-        <div class="console-footer">
-          <div class="console-footnote">
-            Zero Host Device Burden • Frontier Models Deliberate in Parallel • Arbiter Validates Deliverable
+        <!-- Console Action Controls -->
+        <div class="console-actions-bar">
+          <div class="quota-indicator" id="quotaDisplay">
+            Quota: 5/5 Free Deliberations Remaining
           </div>
           <button class="btn btn-primary btn-submit" id="submitBtn">
             ⚡ Convene Council &amp; The Arbiter
           </button>
         </div>
+
       </div>
 
+      <!-- Verified Output Deliverable Card (Hidden until computation) -->
+      <div class="output-card" id="outputCard">
+        
+        <!-- Arbiter Executive Verdict -->
+        <div class="arbiter-card">
+          <div class="arbiter-header">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 20px;">⚖️</span>
+              <h3 style="font-size: 18px; color: #10b981;">Executive Arbiter Verdict</h3>
+            </div>
+            <span class="pill-badge" id="outputVerdictBadge" style="border-color: #10b981; color: #10b981;">
+              APPROVED (Score: 96/100)
+            </span>
+          </div>
+          <p id="outputReasoningText" style="font-size: 14px; color: var(--text-secondary); margin-top: 6px;">
+            The Arbiter evaluated the Council's synthesis. Theoretical blueprints and adversarial invariants verified.
+          </p>
+        </div>
+
+        <!-- Readable Deliverable Content -->
+        <h4 style="margin-bottom: 12px; font-size: 15px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted);">
+          Verified Deliverable Output
+        </h4>
+        <div class="deliverable-content" id="deliverableContent"></div>
+
+        <!-- Action Bar: Download, PDF, Copy -->
+        <div class="output-action-bar">
+          <button class="btn btn-primary" id="downloadDeliverableBtn">
+            📥 Download Deliverable (.md)
+          </button>
+          <button class="btn btn-secondary" id="copyDeliverableBtn">
+            📋 Copy Deliverable Text
+          </button>
+          <button class="btn btn-secondary" id="exportPdfBtn">
+            📄 Print / Export PDF
+          </button>
+          <button class="btn btn-outline" id="newDeliberationBtn">
+            ⚡ New Deliberation
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================== -->
+  <!-- 4. FULLSCREEN DARK SYNAPSE DELIBERATION EXECUTION              -->
+  <!-- ============================================================== -->
+  <div class="synapse-overlay" id="synapseOverlay">
+    <canvas id="synapseCanvas" class="synapse-canvas"></canvas>
+
+    <div class="synapse-hud-card">
+      <div class="synapse-phase-title" id="synapsePhaseTitle">
+        Council Deliberation in Progress
+      </div>
+      <div class="synapse-phase-desc" id="synapsePhaseDesc">
+        Passing electrical action potential pulses across the 5-way neural mesh...
+      </div>
+      <div class="synapse-bar-track">
+        <div class="synapse-bar-fill" id="synapseBarFill"></div>
+      </div>
+      <div style="margin-top: 12px; font-size: 11px; font-family: 'JetBrains Mono', monospace; color: var(--text-muted);">
+        ENFORCED SYNAPSE FLOOR: &ge; 2.0s • 0% HOST LOAD • REAL-TIME MESH
+      </div>
     </div>
   </div>
 
+  <!-- ============================================================== -->
+  <!-- 5. COUNCIL ROLES & ARCHITECTURE (INSPIRED BY REFERENCE)        -->
+  <!-- ============================================================== -->
+  <section class="section" id="council">
+    <div class="container">
+      <div class="section-header">
+        <div class="pill-badge" style="margin-bottom: 16px;">
+          <span>The 5-Node Consensus Architecture</span>
+        </div>
+        <h2 class="section-headline">A Specialized Council of Models</h2>
+        <p>No single model works alone. Hive distributes cognitive responsibilities into specialized nodes orchestrated by The Arbiter.</p>
+      </div>
+
+      <div class="council-grid">
+        
+        <!-- Arbiter -->
+        <div class="council-card card-arbiter">
+          <span class="council-role-badge">EXECUTIVE EVALUATOR</span>
+          <h3>The Arbiter</h3>
+          <p style="margin-top: 8px; font-size: 14px;">
+            Senior evaluator that cross-examines proposed candidate solutions, checks invariant soundness, rejects flawed arguments, and renders publication-grade deliverables.
+          </p>
+        </div>
+
+        <!-- Architect -->
+        <div class="council-card card-architect">
+          <span class="council-role-badge">STRUCTURAL TAXONOMY</span>
+          <h3>The Architect</h3>
+          <p style="margin-top: 8px; font-size: 14px;">
+            Constructs first-principles foundational frameworks, system taxonomies, and high-level theoretical blueprints for the mission.
+          </p>
+        </div>
+
+        <!-- Skeptic -->
+        <div class="council-card card-skeptic">
+          <span class="council-role-badge">ADVERSARIAL STRESS TEST</span>
+          <h3>The Skeptic</h3>
+          <p style="margin-top: 8px; font-size: 14px;">
+            Ruthlessly challenges assumptions, audits boundary conditions, finds Byzantine failure modes, and forces rigorous defense.
+          </p>
+        </div>
+
+        <!-- Verifier -->
+        <div class="council-card card-verifier">
+          <span class="council-role-badge">FORMAL PROOF &amp; AUDIT</span>
+          <h3>The Verifier</h3>
+          <p style="margin-top: 8px; font-size: 14px;">
+            Executes mathematical proofs, constraints audits, algorithmic complexity verification, and factual invariant validation.
+          </p>
+        </div>
+
+        <!-- Synthesizer -->
+        <div class="council-card card-synthesizer">
+          <span class="council-role-badge">DIALECTIC UNIFICATION</span>
+          <h3>The Synthesizer</h3>
+          <p style="margin-top: 8px; font-size: 14px;">
+            Harmonizes valid tensions between the Architect and Skeptic, compiling clean unified consensus ready for Arbiter audit.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
 
   <!-- ============================================================== -->
-  <!-- 3. SLIDE-OUT SIDEBAR DRAWER: Account, Settings & Logout Button -->
+  <!-- 6. GOOGLE AUTHENTICATION MODAL (ZERO 401 LOCKOUT)              -->
+  <!-- ============================================================== -->
+  <div class="auth-modal" id="authModal">
+    <div class="auth-card">
+      <svg viewBox="0 0 24 24" width="36" height="36" style="margin: 0 auto 12px auto; display: block;">
+        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+      </svg>
+      <h3 style="font-size: 20px; color: #111827; margin-bottom: 6px;">Sign in with Google</h3>
+      <p style="font-size: 13px; color: #6b7280; margin-bottom: 20px;">
+        Choose an account to continue to <strong>HIVE AIS MESH</strong>
+      </p>
+
+      <!-- Primary Account (Akmal / 2022abircoc@gmail.com from WhatsApp Screenshot) -->
+      <div class="google-account-btn" id="googleAccountPrimary">
+        <div class="account-avatar">A</div>
+        <div>
+          <div style="font-weight: 600; font-size: 14px; color: #111827;">Akmal (SKAMAN)</div>
+          <div style="font-size: 12px; color: #6b7280;">2022abircoc@gmail.com</div>
+        </div>
+      </div>
+
+      <!-- Custom Account Option -->
+      <div class="google-account-btn" id="googleAccountCustom" style="margin-top: 10px;">
+        <div class="account-avatar" style="background: #4b5563;">+</div>
+        <div>
+          <div style="font-weight: 600; font-size: 14px; color: #111827;">Use another Google account</div>
+          <div style="font-size: 12px; color: #6b7280;">Sign in with a different name or email</div>
+        </div>
+      </div>
+
+      <!-- Custom Account Drawer -->
+      <div id="customAccountDrawer" style="display:none; margin-top: 14px; text-align: left;">
+        <input type="text" id="customNameInput" placeholder="Full Name" style="width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 13px; margin-bottom: 8px;">
+        <input type="email" id="customEmailInput" placeholder="Gmail Address" style="width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 13px; margin-bottom: 8px;">
+        <button class="btn btn-primary btn-sm" id="customSubmitBtn" style="width: 100%;">Continue</button>
+      </div>
+
+      <button class="btn btn-secondary btn-sm" id="closeAuthModalBtn" style="margin-top: 20px; width: 100%; color: #374151;">
+        Cancel
+      </button>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- 7. SLIDE-OUT SIDEBAR DRAWER (SETTINGS & LOGOUT)                -->
   <!-- ============================================================== -->
   <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
   <aside class="sidebar-drawer" id="sidebarDrawer">
     <div class="sidebar-header">
-      <h3>Hive Console Control</h3>
-      <button class="close-btn" id="closeSidebarBtn">&times;</button>
+      <h3 style="font-size: 16px;">Console Control</h3>
+      <button class="btn btn-secondary btn-sm" id="closeSidebarBtn">&times;</button>
     </div>
 
     <div class="sidebar-body">
-      <!-- User Account Information -->
-      <div class="user-profile-panel">
-        <div class="profile-avatar-wrap">
-          <img id="sidebarUserAvatar" src="" alt="Avatar" class="profile-avatar" style="display:none;">
-          <div id="sidebarAvatarFallback" class="profile-avatar-fallback">A</div>
-        </div>
-        <div class="profile-meta">
-          <div class="profile-name" id="sidebarUserName">Akmal (SKAMAN)</div>
-          <div class="profile-email" id="sidebarUserEmail">2022abircoc@gmail.com</div>
-          <span class="chip chip-status" style="font-size:10px; margin-top:4px;">Verified Identity</span>
-        </div>
+      <!-- Profile Card -->
+      <div style="background: var(--bg-card); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); margin-bottom: 20px;">
+        <div style="font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; margin-bottom: 4px;">User Account</div>
+        <div id="sidebarUserName" style="font-weight: 700; font-size: 15px;">Akmal (SKAMAN)</div>
+        <div id="sidebarUserEmail" style="font-size: 13px; color: var(--text-secondary);">2022abircoc@gmail.com</div>
       </div>
 
-      <!-- Quota Meter -->
-      <div class="sidebar-section">
-        <label class="sidebar-label">Daily Deliberation Quota</label>
-        <div class="quota-meter">
-          <div class="quota-meter-bar" id="quotaProgressBar" style="width:100%;"></div>
-        </div>
-        <div class="quota-info-text" id="sidebarQuotaText">5 of 5 free deliberations remaining today</div>
+      <!-- Engine BYOK Settings -->
+      <div style="margin-bottom: 24px;">
+        <div style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px;">Engine Configuration (BYOK)</div>
+        <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 10px;">Supply a Gemini API key for unlimited deliberations with zero quota limits:</p>
+        <input type="password" id="geminiApiKeyInput" placeholder="Gemini API Key (AIzaSy...)" style="width: 100%; padding: 10px; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); color: var(--text-primary); font-size: 13px; margin-bottom: 8px;">
+        <button class="btn btn-secondary btn-sm" id="saveKeyBtn" style="width: 100%;">Save Key</button>
       </div>
 
-      <!-- Engine & BYOK Settings (Accordion) -->
-      <div class="sidebar-section">
-        <div class="accordion-header" id="settingsToggle">
-          <label class="sidebar-label" style="cursor:pointer; display:flex; justify-content:space-between; width:100%;">
-            <span>⚙️ Engine &amp; API Key Settings</span>
-            <span>▾</span>
-          </label>
-        </div>
-        <div class="settings-panel" id="settingsPanel">
-          <p class="settings-help">To run unlimited deliberations with zero quota limits, supply a free Gemini API key:</p>
-          <input type="password" id="apiKeyInput" placeholder="Gemini API Key (AIzaSy...)" class="sidebar-input">
-          <input type="text" id="localUrlInput" value="http://localhost:8088" placeholder="Local Desktop Daemon URL" class="sidebar-input" style="margin-top:8px;">
-          <button class="btn btn-secondary btn-sm" id="saveSettingsBtn" style="margin-top:10px; width:100%;">Save Engine Config</button>
-        </div>
+      <!-- Daily Quota -->
+      <div>
+        <div style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px;">Daily Free Quota</div>
+        <div id="sidebarQuotaText" style="font-size: 13px; color: var(--text-secondary); font-family: 'JetBrains Mono', monospace;">5 of 5 free runs available today</div>
       </div>
+    </div>
 
-      <!-- LOGOUT BUTTON (Securely inside the slide bar) -->
-      <div class="sidebar-footer">
-        <button class="btn btn-danger" id="logoutBtn">
-          🚪 Sign Out / Exit Mesh
-        </button>
-      </div>
+    <div class="sidebar-footer">
+      <button class="btn btn-danger" id="logoutBtn" style="width: 100%;">
+        🚪 Sign Out
+      </button>
     </div>
   </aside>
 
-
   <!-- ============================================================== -->
-  <!-- 4. DARK FULLSCREEN SYNAPSE EXECUTION VIEW (Live Real-Time Mesh)-->
+  <!-- 8. FOOTER                                                      -->
   <!-- ============================================================== -->
-  <div id="synapseView" class="view-section synapse-view" style="display:none;">
-    <!-- Large Interactive Synapse Canvas with Lightning & Action Potentials -->
-    <canvas id="synapseCanvas" class="synapse-canvas"></canvas>
-
-    <!-- Real-Time Workflow Telemetry Overlay -->
-    <div class="synapse-hud">
-      <div class="synapse-badge">
-        <span class="pulse-indicator"></span>
-        <span>NEURAL SYNAPSE CURRENT ACTIVE</span>
-      </div>
-
-      <div class="synapse-stage-card">
-        <div class="stage-title" id="synapsePhaseTitle">Council Convergence in Progress</div>
-        <div class="stage-desc" id="synapsePhaseDesc">Passing high-frequency action potentials across the 5-way consensus mesh...</div>
-        <div class="synapse-progress-track">
-          <div class="synapse-progress-fill" id="synapseProgressBar"></div>
-        </div>
-      </div>
-
-      <div class="synapse-telemetry-strip">
-        <span>FRONTIER SYNAPSE: 60 FPS</span>
-        <span>•</span>
-        <span>AXON STATE: CONVERGING</span>
-        <span>•</span>
-        <span>BURDEN: 0% HOST LOAD</span>
-      </div>
-    </div>
-  </div>
-
-
-  <!-- ============================================================== -->
-  <!-- 5. DEDICATED OUTPUT PAGE: Verified Readable Deliverable & Download -->
-  <!-- ============================================================== -->
-  <div id="outputView" class="view-section output-view" style="display:none;">
+  <footer style="padding: 48px 0; border-top: 1px solid var(--border-subtle); text-align: center; font-size: 13px; color: var(--text-muted); position: relative; z-index: 2;">
     <div class="container">
-      
-      <!-- Output Header Bar -->
-      <div class="output-topbar">
-        <button class="btn btn-secondary btn-sm" id="backToConsoleBtn">&larr; Return to Console</button>
-        
-        <div class="output-actions">
-          <!-- Download Deliverable Button -->
-          <button class="btn btn-primary" id="downloadDeliverableBtn">
-            📥 Download Deliverable (.md)
-          </button>
-          <!-- Export PDF Button -->
-          <button class="btn btn-secondary" id="exportPdfBtn">
-            📄 Export / Print PDF
-          </button>
-        </div>
-      </div>
-
-      <!-- Arbiter Executive Evaluation Card -->
-      <div class="arbiter-verdict-card" id="outputArbiterCard">
-        <div class="verdict-header">
-          <div class="verdict-title-group">
-            <span class="verdict-icon">⚖️</span>
-            <h2>Executive Arbiter Evaluation</h2>
-          </div>
-          <span class="verdict-tag" id="outputVerdictTag">APPROVED (Score: 96/100)</span>
-        </div>
-        <div class="verdict-body">
-          <p id="outputReasoningText">
-            The Arbiter evaluated the Council's multi-perspective synthesis. Theoretical blueprints and adversarial edge cases are rigorously resolved with zero residual invariant violations.
-          </p>
-        </div>
-      </div>
-
-      <!-- Comprehensive Readable Deliverable Window -->
-      <div class="deliverable-card">
-        <div class="deliverable-header">
-          <span>📄 FINAL DELIVERABLE OUTPUT</span>
-          <span class="chip chip-status">Verified Consensus</span>
-        </div>
-        <div class="deliverable-content" id="outputDeliverableContent"></div>
-      </div>
-
-      <!-- Collapsible Council Discussion Chamber -->
-      <div class="council-accordion-card">
-        <div class="accordion-toggle-bar" id="councilTranscriptToggle">
-          <span>🏛️ Inspect Council Deliberation Chamber (Architect, Skeptic, Verifier, Synthesizer)</span>
-          <span id="councilToggleArrow">▾</span>
-        </div>
-        <div class="council-transcript-body" id="councilTranscriptBody" style="display:none;">
-          <div class="council-grid" id="councilGrid"></div>
-        </div>
-      </div>
-
-      <!-- Interactive Dialogue with The Arbiter -->
-      <div class="chat-container" style="margin-top:24px;">
-        <div class="section-header">
-          <span>💬 INTERACTIVE DIALOGUE WITH THE ARBITER</span>
-        </div>
-        <div class="chat-history" id="chatHistory">
-          <div class="chat-bubble arbiter">
-            <strong>The Arbiter:</strong> I have verified this deliverable against the consensus specification. Ask me any clarifying question, request modifications, or ask for mathematical derivations in plain terms.
-          </div>
-        </div>
-        <div class="chat-input-row">
-          <input type="text" id="chatInput" placeholder="Ask The Arbiter questions about the deliverable...">
-          <button class="btn btn-primary" id="chatSendBtn">Send</button>
-        </div>
-      </div>
-
-      <!-- Bottom Launch CTA -->
-      <div class="output-bottom-bar">
-        <button class="btn btn-primary btn-submit" id="newDeliberationBtn">
-          ⚡ Launch Another Deliberation
-        </button>
-      </div>
-
+      <p style="margin-bottom: 8px;">⚡ HIVE AIS MESH — Frontier Multi-Model Deliberation Architecture</p>
+      <p style="font-size: 12px; color: var(--text-dim);">Deployed on GitHub Pages • Zero Server Cost • Client-Side Security Shield</p>
     </div>
-  </div>
+  </footer>
 
-  <!-- Core Scripts -->
+  <!-- Scripts -->
   <script src="js/neural_constellation.js"></script>
   <script src="js/auth_security.js"></script>
   <script src="js/multimodel_engine.js"></script>

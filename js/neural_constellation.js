@@ -90,10 +90,10 @@ class NeuralConstellation {
     if (!this.canvas) return;
     const parent = this.canvas.parentElement;
     const dpr = window.devicePixelRatio || 1;
-    const width = parent ? parent.clientWidth : window.innerWidth;
+    const width = (parent && parent.clientWidth > 0) ? parent.clientWidth : window.innerWidth;
     const height = this.isSynapseMode 
-      ? (parent ? parent.clientHeight : window.innerHeight) 
-      : (this.isLandingMode ? (parent ? parent.clientHeight : 540) : 340);
+      ? window.innerHeight 
+      : ((parent && parent.clientHeight > 0) ? parent.clientHeight : (this.isLandingMode ? 540 : 340));
 
     this.width = width;
     this.height = height;
