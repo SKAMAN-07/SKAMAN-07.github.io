@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hive — Multi-Model Deliberation & Executive Arbiter Engine</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+  
+  <!-- Google Identity Services (GIS) for Google Account Sign-In -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+  <div class="container">
+    <!-- Top Navigation & Telemetry HUD -->
+    <header>
+      <div class="logo-group">
+        <h1>⚡ HIVE</h1>
+        <span class="chip">Multi-Model Deliberation</span>
+      </div>
+
+      <div class="nav-actions">
+        <span class="chip chip-status">
+          <span class="chip-dot"></span>
+          Mesh Ready
+        </span>
+        <span class="chip" id="quotaText">5/5 Daily Free</span>
+        
+        <button class="btn btn-secondary" id="settingsBtn" style="padding:6px 12px; font-size:12px;" title="Engine & API Key Settings">⚙️ Settings</button>
+
+        <!-- Google Profile Button -->
+        <button class="btn" id="authBtn" style="padding:6px 14px; font-size:12px;">Sign in with Google</button>
+        <div id="userProfileChip" class="chip" style="display:none; border-color:var(--cyan-primary); padding:3px 10px;">
+          <img id="userAvatar" src="" alt="Avatar" style="width:20px; height:20px; border-radius:50%; display:none; vertical-align:middle; margin-right:6px;">
+          <span id="userNameText" style="color:#ffffff;"></span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Real-Time Neural Constellation Animation (Matching Reference Video) -->
+    <div class="constellation-viewport">
+      <div class="constellation-hud-overlay">
+        <span>TOPOLOGY: 5-WAY CONSENSUS MESH</span>
+        <span>•</span>
+        <span>LATENCY: 12ms</span>
+        <span>•</span>
+        <span>REAL-TIME PACKETS: ACTIVE</span>
+      </div>
+      <canvas id="neuralCanvas"></canvas>
+    </div>
+
+    <!-- Query & Universal Research File Console -->
+    <div class="console-card">
+      <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+        <input type="file" id="fileInput" multiple style="display:none;">
+        <div style="font-size:14px; font-weight:700; color:var(--cyan-glow); margin-bottom:4px;">
+          📁 Drop or Click to Attach Research Files (Unrestricted: Any Type)
+        </div>
+        <div style="font-size:12px; color:var(--text-muted);">
+          Attach source code, PDFs, Word docs, spreadsheets, slides, databases, images, or raw data for cross-model auditing
+        </div>
+      </div>
+      <div id="attachedFilesContainer" style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px;"></div>
+
+      <textarea id="queryInput" placeholder="Enter problem, mission, or instructions with uploaded files (e.g. 'Audit this system blueprint for failure modes', 'Prove algorithmic complexity under adversarial split', 'Answer unresolved questions from research paper')..."></textarea>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+        <div style="font-size:12px; color:var(--text-dim);">
+          Zero Host Device Burden • Frontier Neural Models Debate in Parallel • The Arbiter Delivers Verified Deliverable
+        </div>
+        <button class="btn" id="submitBtn">⚡ Convene Council & The Arbiter</button>
+      </div>
+    </div>
+
+    <!-- Deliberation Results Area -->
+    <div id="resultsArea" style="display:none;">
+      <!-- Executive Arbiter Evaluation Panel -->
+      <div class="section-header">
+        <span>⚖️ EXECUTIVE ARBITER EVALUATION</span>
+      </div>
+      <div id="arbiterCard" class="arbiter-card"></div>
+
+      <!-- The Council Deliberation Chamber -->
+      <div class="section-header">
+        <span>🏛️ THE DISCUSSION ROOM (COUNCIL REAL-TIME DEBATE)</span>
+      </div>
+      <div class="council-grid" id="councilGrid"></div>
+
+      <!-- Interactive Dialogue with The Arbiter -->
+      <div class="section-header">
+        <span>💬 INTERACTIVE DIALOGUE WITH THE ARBITER (GEMINI AI)</span>
+      </div>
+      <div class="chat-container">
+        <div class="chat-history" id="chatHistory"></div>
+        <div style="display:flex; gap:10px;">
+          <input type="text" id="chatInput" style="flex:1; background:rgba(11,15,25,0.85); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); color:#fff; padding:12px 14px; font-size:13px; outline:none;" placeholder="Talk with The Arbiter: ask questions about the deliverable, request modifications, or ask for human-readable calculation explanations...">
+          <button class="btn" id="chatSendBtn" style="padding:10px 22px;">Send</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Auth Modal -->
+  <div class="modal-overlay" id="authModal">
+    <div class="modal-content">
+      <div class="modal-title">🔐 Google Account Authentication</div>
+      <p style="font-size:13px; color:var(--text-muted); margin-bottom:18px;">
+        To protect against malicious bot swarms and prevent denial-of-service spam, sign in with your Google Account.
+      </p>
+
+      <!-- Google GIS Button Element -->
+      <div id="g_id_onload"
+           data-client_id="YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
+           data-callback="handleGoogleSignIn"
+           data-auto_prompt="false">
+      </div>
+      <div class="g_id_signin" data-type="standard" data-size="large" data-theme="filled_black" data-text="sign_in_with" data-shape="rectangular" data-logo_alignment="left"></div>
+
+      <div style="margin-top:16px; padding-top:14px; border-top:1px solid var(--border-subtle); display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-size:11px; color:var(--text-dim);">Anti-Bot Shield Active</span>
+        <button class="btn btn-secondary" id="closeAuthModal" style="padding:6px 14px; font-size:12px;">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal (BYOK & Local Daemon Bridge) -->
+  <div class="modal-overlay" id="settingsModal">
+    <div class="modal-content">
+      <div class="modal-title">⚙️ Engine & API Settings</div>
+      <p style="font-size:12px; color:var(--text-muted); margin-bottom:14px;">
+        Zero-burden architecture: To run unlimited deliberations with zero load on the host, enter your own free Google Gemini API key or connect to your local desktop daemon.
+      </p>
+
+      <div style="margin-bottom:12px;">
+        <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:6px;">Google Gemini API Key (Optional - Free Tier):</label>
+        <input type="password" id="apiKeyInput" placeholder="AIzaSy..." style="width:100%; background:rgba(11,15,25,0.9); border:1px solid var(--border-subtle); border-radius:4px; padding:8px 12px; color:#fff; font-size:13px; outline:none;">
+      </div>
+
+      <div style="margin-bottom:16px;">
+        <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:6px;">Local Desktop Daemon Bridge (Optional):</label>
+        <input type="text" id="localUrlInput" value="http://localhost:8088" style="width:100%; background:rgba(11,15,25,0.9); border:1px solid var(--border-subtle); border-radius:4px; padding:8px 12px; color:#fff; font-size:13px; outline:none;">
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:10px;">
+        <button class="btn btn-secondary" id="closeSettingsModal" style="padding:6px 14px; font-size:12px;">Cancel</button>
+        <button class="btn" id="saveSettingsBtn" style="padding:6px 16px; font-size:12px;">Save Settings</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Application Scripts -->
+  <script src="js/neural_constellation.js"></script>
+  <script src="js/auth_security.js"></script>
+  <script src="js/multimodel_engine.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
