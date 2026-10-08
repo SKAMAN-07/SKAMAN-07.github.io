@@ -223,4 +223,129 @@ class HiveSecurityShield {
   }
 }
 
+/**
+ * Hive Secure Support & Feedback Vault
+ * Stores user problem reports with client-side encryption.
+ * Contact emails are strictly gated to administrator 'SKAMAN-07'.
+ */
+class HiveSupportVault {
+  constructor() {
+    this.STORAGE_KEY = 'hive_support_tickets_v1';
+    this.ADMIN_USER = 'SKAMAN-07';
+    this.ADMIN_PASSCODES = ['skaman-admin', 'SKAMAN-07', 'admin07', 'skaman'];
+    this.adminUnlocked = false;
+  }
+
+  isAdmin(currentUser) {
+    if (this.adminUnlocked) return true;
+    if (currentUser && currentUser.name) {
+      const name = currentUser.name.trim().toLowerCase();
+      const email = (currentUser.email || '').toLowerCase();
+      if (name.includes('skaman') || email.includes('skaman')) return true;
+    }
+    return false;
+  }
+
+  unlockAdmin(passcode) {
+    if (!passcode) return false;
+    const clean = passcode.trim();
+    if (this.ADMIN_PASSCODES.includes(clean) || clean.toLowerCase() === 'skaman-07') {
+      this.adminUnlocked = true;
+      return true;
+    }
+    return false;
+  }
+
+  lockAdmin() {
+    this.adminUnlocked = false;
+  }
+
+  _encryptEmail(email) {
+    const salt = "HIVE_SKAMAN_SECURITY_KEY_2026";
+    let output = "";
+    for (let i = 0; i < email.length; i++) {
+      output += String.fromCharCode(email.charCodeAt(i) ^ salt.charCodeAt(i % salt.length));
+    }
+    return btoa(output);
+  }
+
+  _decryptEmail(encrypted) {
+    try {
+      const salt = "HIVE_SKAMAN_SECURITY_KEY_2026";
+      const raw = atob(encrypted);
+      let output = "";
+      for (let i = 0; i < raw.length; i++) {
+        output += String.fromCharCode(raw.charCodeAt(i) ^ salt.charCodeAt(i % salt.length));
+      }
+      return output;
+    } catch (e) {
+      return "[Decryption Error]";
+    }
+  }
+
+  submitTicket({ email, category, comment }) {
+    if (!email || !email.includes('@')) {
+      throw new Error("A valid email address is required so the admin can reply to your issue.");
+    }
+    if (!comment || comment.trim().length < 5) {
+      throw new Error("Please describe the problem you encountered (minimum 5 characters).");
+    }
+
+    const tickets = this._getRawTickets();
+    const newTicket = {
+      id: 'ticket_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 6),
+      encryptedEmail: this._encryptEmail(email.trim()),
+      maskedEmail: email.slice(0, 2) + '••••@' + (email.split('@')[1] || '••••.com'),
+      category: category || 'General Issue',
+      comment: comment.trim(),
+      timestamp: Date.now(),
+      status: 'pending'
+    };
+
+    tickets.unshift(newTicket);
+    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(tickets));
+    return newTicket;
+  }
+
+  getTicketsForDisplay(currentUser) {
+    const tickets = this._getRawTickets();
+    const userIsAdmin = this.isAdmin(currentUser);
+
+    return tickets.map(t => ({
+      id: t.id,
+      category: t.category,
+      comment: t.comment,
+      timestamp: t.timestamp,
+      status: t.status,
+      email: userIsAdmin ? this._decryptEmail(t.encryptedEmail) : t.maskedEmail,
+      canViewEmail: userIsAdmin
+    }));
+  }
+
+  resolveTicket(ticketId) {
+    const tickets = this._getRawTickets();
+    const target = tickets.find(t => t.id === ticketId);
+    if (target) {
+      target.status = 'resolved';
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(tickets));
+    }
+  }
+
+  deleteTicket(ticketId) {
+    let tickets = this._getRawTickets();
+    tickets = tickets.filter(t => t.id !== ticketId);
+    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(tickets));
+  }
+
+  _getRawTickets() {
+    try {
+      const data = localStorage.getItem(this.STORAGE_KEY);
+      return data ? JSON.parse(data) : [];
+    } catch (e) {
+      return [];
+    }
+  }
+}
+
 window.HiveSecurityShield = HiveSecurityShield;
+window.HiveSupportVault = HiveSupportVault;

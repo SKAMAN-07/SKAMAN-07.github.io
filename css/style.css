@@ -909,3 +909,416 @@ p {
   25% { transform: translateX(-4px); }
   75% { transform: translateX(4px); }
 }
+
+/* ============================================================== */
+/* NEW CHAT CONFIRMATION MODAL                                    */
+/* ============================================================== */
+.confirm-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 5, 7, 0.85);
+  backdrop-filter: blur(8px);
+  z-index: 10005;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.confirm-modal-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  max-width: 460px;
+  width: 100%;
+  text-align: center;
+  box-shadow: var(--shadow-lg);
+  animation: modalPop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.confirm-modal-icon {
+  font-size: 36px;
+  margin-bottom: 12px;
+}
+
+.confirm-modal-title {
+  font-size: 20px;
+  color: var(--text-primary);
+  margin-bottom: 10px;
+}
+
+.confirm-modal-desc {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 24px;
+  text-align: left;
+}
+
+.confirm-modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* ============================================================== */
+/* ARBITER CONSULTATION CHAT WINDOW                               */
+/* ============================================================== */
+.arbiter-chat-card {
+  margin-top: 28px;
+  background: var(--bg-elevated);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.arbiter-chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.arbiter-chat-title-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.arbiter-chat-avatar {
+  font-size: 24px;
+}
+
+.arbiter-chat-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #34d399;
+}
+
+.arbiter-chat-subtitle {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.arbiter-chat-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  color: #34d399;
+}
+
+.arbiter-chat-status .status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #34d399;
+  box-shadow: 0 0 8px #34d399;
+}
+
+.arbiter-quick-chips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.chip-btn {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  padding: 6px 12px;
+  border-radius: 9999px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.chip-btn:hover {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: rgba(16, 185, 129, 0.4);
+  color: #34d399;
+}
+
+.arbiter-chat-stream {
+  max-height: 380px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 10px;
+  background: var(--bg-card);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+}
+
+.arbiter-msg {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: 88%;
+}
+
+.arbiter-msg.msg-arbiter {
+  align-self: flex-start;
+}
+
+.arbiter-msg.msg-user {
+  align-self: flex-end;
+}
+
+.msg-sender {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.msg-bubble {
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.msg-arbiter .msg-bubble {
+  background: var(--bg-elevated);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  color: var(--text-primary);
+}
+
+.msg-user .msg-bubble {
+  background: var(--coral-primary);
+  color: #ffffff;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 var(--radius-sm);
+}
+
+.apply-change-btn {
+  margin-top: 10px;
+  display: inline-block;
+  background: rgba(16, 185, 129, 0.2);
+  border: 1px solid #10b981;
+  color: #34d399;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.apply-change-btn:hover {
+  background: #10b981;
+  color: #0c0d10;
+}
+
+.arbiter-chat-input-row {
+  display: flex;
+  gap: 10px;
+}
+
+.arbiter-input {
+  flex: 1;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-size: 14px;
+  color: var(--text-primary);
+  resize: vertical;
+  min-height: 48px;
+}
+
+.arbiter-input:focus {
+  outline: none;
+  border-color: #34d399;
+}
+
+/* ============================================================== */
+/* SIDEBAR USER GUIDELINES                                        */
+/* ============================================================== */
+.sidebar-guidelines-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  margin-bottom: 20px;
+}
+
+.guidelines-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.guidelines-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.guideline-item {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.guideline-icon {
+  font-size: 16px;
+  line-height: 1.2;
+}
+
+.guideline-item strong {
+  display: block;
+  font-size: 12px;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.guideline-item p {
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.45;
+  margin: 0;
+}
+
+/* ============================================================== */
+/* SUPPORT CONSOLE PANEL                                          */
+/* ============================================================== */
+.support-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 5, 7, 0.85);
+  backdrop-filter: blur(8px);
+  z-index: 10006;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.support-modal-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+  animation: modalPop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.support-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.support-privacy-notice {
+  background: rgba(218, 119, 86, 0.1);
+  border: 1px solid rgba(218, 119, 86, 0.25);
+  color: #e08b6d;
+  font-size: 12px;
+  line-height: 1.5;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 16px;
+}
+
+.support-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+
+.support-input {
+  width: 100%;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.support-input:focus {
+  outline: none;
+  border-color: var(--coral-primary);
+}
+
+.admin-desk-section {
+  margin-top: 24px;
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 16px;
+}
+
+.admin-desk-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.admin-locked-notice {
+  font-size: 12px;
+  color: var(--text-muted);
+  background: var(--bg-surface);
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px dashed var(--border-subtle);
+}
+
+.admin-tickets-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.admin-ticket-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.admin-ticket-email {
+  font-size: 13px;
+  font-weight: 700;
+  color: #38bdf8;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.admin-ticket-body {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.btn-xs {
+  padding: 4px 8px;
+  font-size: 11px;
+}

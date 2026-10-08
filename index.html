@@ -24,6 +24,7 @@
         <li><a class="nav-link" href="#overview" id="navLinkOverview">Overview</a></li>
         <li><a class="nav-link" href="#playground" id="navLinkPlayground">Playground</a></li>
         <li><a class="nav-link" href="#council" id="navLinkCouncil">Council</a></li>
+        <li><a class="nav-link" href="#support" id="navLinkSupport">Support</a></li>
       </ul>
 
       <div class="nav-actions">
@@ -109,6 +110,9 @@
                 <span>Synthesizer</span>
               </div>
             </div>
+            <button class="btn btn-outline btn-sm" id="newChatHeaderBtn" title="Start a new chat or reset project">
+              ➕ New Chat
+            </button>
             <button class="btn btn-danger btn-sm" id="endChatHeaderBtn" title="Cloud Burst: Reset project memory buffer">
               ⚡ END CHAT
             </button>
@@ -172,6 +176,61 @@
           Verified Deliverable Output
         </h4>
         <div class="deliverable-content" id="deliverableContent"></div>
+
+        <!-- ============================================================== -->
+        <!-- INTERACTIVE ARBITER DELIBERATION & MODIFICATION CHAT WINDOW    -->
+        <!-- ============================================================== -->
+        <div class="arbiter-chat-card" id="arbiterChatCard">
+          <div class="arbiter-chat-header">
+            <div class="arbiter-chat-title-group">
+              <span class="arbiter-chat-avatar">⚖️</span>
+              <div>
+                <div class="arbiter-chat-title">The Arbiter — Consultation &amp; Revision Desk</div>
+                <div class="arbiter-chat-subtitle">Direct dialogue on completeness, custom revisions, and deep dialectic exploration</div>
+              </div>
+            </div>
+            <div class="arbiter-chat-status">
+              <span class="status-dot"></span>
+              <span>Deliberation Ready</span>
+            </div>
+          </div>
+
+          <!-- Quick Intent Chips -->
+          <div class="arbiter-quick-chips">
+            <button class="chip-btn" data-intent="status">🔍 Is the work done?</button>
+            <button class="chip-btn" data-intent="modify">✏️ Request Changes / Modifications</button>
+            <button class="chip-btn" data-intent="discuss">💬 Deliberate Deeper on Topic</button>
+            <button class="chip-btn" data-intent="audit">🛡️ Invariant &amp; Adversarial Audit</button>
+          </div>
+
+          <!-- Chat Message Feed -->
+          <div class="arbiter-chat-stream" id="arbiterChatStream">
+            <div class="arbiter-msg msg-arbiter">
+              <div class="msg-sender">⚖️ The Arbiter</div>
+              <div class="msg-bubble">
+                I have audited the Council's synthesis. You may consult with me directly:
+                <ul style="margin: 6px 0 0 18px;">
+                  <li>Ask <strong>"Is the work done?"</strong> to evaluate completeness against all invariants.</li>
+                  <li>Request <strong>modifications or changes</strong> to revise any section of the deliverable.</li>
+                  <li>Conduct <strong>further technical discussion</strong> on this topic with full project memory.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chat Input Controls -->
+          <div class="arbiter-chat-input-row">
+            <textarea 
+              class="arbiter-input" 
+              id="arbiterMsgInput" 
+              rows="2" 
+              placeholder="Ask The Arbiter about the project, request changes, or verify completeness..."
+            ></textarea>
+            <button class="btn btn-primary" id="arbiterSendBtn">
+              Consult ↵
+            </button>
+          </div>
+        </div>
 
         <!-- Action Bar: Download, PDF, Copy -->
         <div class="output-action-bar">
@@ -337,19 +396,46 @@
         <div id="sidebarUserEmail" style="font-size: 13px; color: var(--text-secondary);">Not signed in</div>
       </div>
 
-      <!-- Frontier Multi-Model Roster -->
-      <div style="margin-bottom: 24px;">
-        <div style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px;">Active Multi-Model Architecture</div>
-        <div style="font-size: 12px; color: var(--text-secondary); line-height: 1.8; background: var(--bg-card); padding: 14px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); margin-bottom: 14px;">
-          <div><strong style="color: var(--blue-architect);">Architect:</strong> Claude 3.7 Sonnet</div>
-          <div><strong style="color: var(--crimson-skeptic);">Skeptic:</strong> DeepSeek-R1</div>
-          <div><strong style="color: var(--amber-gold);">Verifier:</strong> GPT-4o</div>
-          <div><strong style="color: var(--violet-synth);">Synthesizer:</strong> Claude 3.5 Sonnet</div>
-          <div><strong style="color: var(--emerald-arbiter);">Executive Arbiter:</strong> Consensus Engine</div>
+      <!-- Official Platform User Guidelines & Privacy Shield -->
+      <div class="sidebar-guidelines-box">
+        <div class="guidelines-header">
+          <span style="font-size: 15px;">🛡️</span>
+          <span style="font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--coral-glow);">User Guidelines &amp; Privacy Shield</span>
         </div>
-        <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 12px;">Zero API key required. High-speed local and in-browser execution with persistent memory.</p>
-        <button class="btn btn-danger btn-sm" id="sidebarEndChatBtn" style="width: 100%; margin-bottom: 8px;">
-          ⚡ END CHAT (Cloud Burst)
+
+        <ul class="guidelines-list">
+          <li class="guideline-item">
+            <span class="guideline-icon">🛠️</span>
+            <div>
+              <strong>Active Developing Phase</strong>
+              <p>Hive is currently in an active development phase. Multi-model consensus weights and neural routing are continuously evolving.</p>
+            </div>
+          </li>
+          <li class="guideline-item">
+            <span class="guideline-icon">⚠️</span>
+            <div>
+              <strong>AI Can Make Mistakes</strong>
+              <p>Frontier neural models may occasionally generate inaccuracies or dialectic artifacts. Always review and verify mission-critical figures, code, and conclusions.</p>
+            </div>
+          </li>
+          <li class="guideline-item">
+            <span class="guideline-icon">🔒</span>
+            <div>
+              <strong>Zero User Data Retention</strong>
+              <p>Every user data has nothing to do with us. We do not harvest, store, or sell your research files, project queries, or deliberations.</p>
+            </div>
+          </li>
+          <li class="guideline-item">
+            <span class="guideline-icon">⚡</span>
+            <div>
+              <strong>Instant Ephemeral Purge</strong>
+              <p>Your session details, draft buffers, and conversation memory are wiped the very second you click END CHAT, close the page, or sign out.</p>
+            </div>
+          </li>
+        </ul>
+
+        <button class="btn btn-danger btn-sm" id="sidebarEndChatBtn" style="width: 100%; margin-top: 14px;">
+          ⚡ END CHAT (Cloud Burst Purge)
         </button>
       </div>
 
@@ -370,6 +456,90 @@
   <!-- Cloud Burst Toast Notification -->
   <div class="cloud-burst-toast" id="cloudBurstToast">
     ⚡ Cloud Burst: Project memory & context buffer purged.
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- NEW CHAT CONFIRMATION MODAL (AGREE / DISAGREE)                  -->
+  <!-- ============================================================== -->
+  <div class="confirm-modal-backdrop" id="newChatConfirmModal" style="display:none;">
+    <div class="confirm-modal-card">
+      <div class="confirm-modal-icon">⚠️</div>
+      <h3 class="confirm-modal-title">Clear Previous Chat Session?</h3>
+      <p class="confirm-modal-desc">
+        You are starting a new chat. Do you want to clear your previous deliberation history and context?
+        <br><br>
+        • <strong>Agree:</strong> Purges all previous memory and starts a fresh slate.<br>
+        • <strong>Disagree:</strong> Retains previous chat context and preserves your session.
+      </p>
+      <div class="confirm-modal-actions">
+        <button class="btn btn-danger" id="newChatAgreeBtn">Agree (Clear Previous Chat)</button>
+        <button class="btn btn-secondary" id="newChatDisagreeBtn">Disagree (Keep Previous Chat)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- SUPPORT CONSOLE PANEL (USER COMMENTS & ADMIN RESOLUTION DESK)   -->
+  <!-- ============================================================== -->
+  <div class="support-modal-backdrop" id="supportModal" style="display:none;">
+    <div class="support-modal-card">
+      <div class="support-header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 20px;">💬</span>
+          <h3 style="font-size: 18px;">Hive Support &amp; Problem Desk</h3>
+        </div>
+        <button class="btn btn-secondary btn-sm" id="closeSupportModalBtn">&times;</button>
+      </div>
+
+      <!-- Problem Submission Form -->
+      <div class="support-form-section">
+        <div class="support-privacy-notice">
+          🛡️ <strong>Admin Privacy Shield:</strong> Submissions and email addresses are securely encrypted. Only the verified platform administrator (<strong>SKAMAN-07</strong>) can view your email to respond when your problem is resolved. Others cannot view them.
+        </div>
+
+        <div style="margin-bottom: 12px;">
+          <label class="support-label">Your Email (for resolution response)</label>
+          <input type="email" id="supportEmailInput" class="support-input" placeholder="youremail@example.com" required>
+        </div>
+
+        <div style="margin-bottom: 12px;">
+          <label class="support-label">Problem Category</label>
+          <select id="supportCategorySelect" class="support-input">
+            <option value="Issue on Web">Web Application Bug / Glitch</option>
+            <option value="Deliberation Quality">Model Consensus / Deliverable Issue</option>
+            <option value="Authentication">Google Sign-In / Access Issue</option>
+            <option value="UI & Performance">UI Lag / Visual Glitch</option>
+            <option value="Feature Request">Suggestion / Feature Request</option>
+          </select>
+        </div>
+
+        <div style="margin-bottom: 14px;">
+          <label class="support-label">Describe the Problem Faced in the Web</label>
+          <textarea id="supportCommentInput" class="support-input" rows="4" placeholder="Describe the issue you experienced on the website..."></textarea>
+        </div>
+
+        <button class="btn btn-primary" id="supportSubmitBtn" style="width: 100%;">
+          Submit Problem Report
+        </button>
+        <div id="supportFeedbackStatus" style="display:none; margin-top: 10px; font-size: 13px;"></div>
+      </div>
+
+      <!-- Admin Desk Section (Strictly gated to SKAMAN-07) -->
+      <div class="admin-desk-section">
+        <div class="admin-desk-header">
+          <span style="font-weight: 700; font-size: 13px; text-transform: uppercase; color: var(--emerald-arbiter);">👑 Admin Resolution Desk (SKAMAN-07 Only)</span>
+          <button class="btn btn-outline btn-xs" id="adminToggleAuthBtn">Unlock Admin</button>
+        </div>
+
+        <div id="adminLockedNotice" class="admin-locked-notice">
+          🔒 Submitter emails are encrypted and hidden. Only administrator <code>SKAMAN-07</code> can decrypt emails to reply.
+        </div>
+
+        <div id="adminTicketsContainer" class="admin-tickets-container" style="display:none;">
+          <div id="adminTicketsList"></div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- ============================================================== -->

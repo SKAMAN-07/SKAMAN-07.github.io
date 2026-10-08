@@ -2,17 +2,21 @@
  * Hive Application Coordinator
  * Anthropic Editorial Aesthetics • Real-Time Multi-Model Deliberation
  * Anti-Burner Google Auth • Persistent Project Memory • Cloud Burst ("END CHAT")
+ * Interactive Arbiter Chat • New Chat Confirmation Modal • Secure Support Desk
  */
 
 document.addEventListener('DOMContentLoaded', () => {
   // 1. Initialize Core Services
   const security = new HiveSecurityShield();
   const engine = new MultiModelEngine();
+  const supportVault = new HiveSupportVault();
   window.securityShield = security;
   window.modelEngine = engine;
+  window.supportVault = supportVault;
 
   let attachedFiles = [];
   let currentDeliverable = "";
+  let arbiterHistory = [];
 
   // 2. DOM Elements
   const heroCanvas = document.getElementById('heroCanvas');
@@ -28,6 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const navAuthBtnText = document.getElementById('navAuthBtnText');
   const navAvatarBadge = document.getElementById('navAvatarBadge');
   const heroLaunchBtn = document.getElementById('heroLaunchBtn');
+  const navLinkSupport = document.getElementById('navLinkSupport');
 
   // Playground & Inputs
   const dropzone = document.getElementById('dropzone');
@@ -38,12 +43,18 @@ document.addEventListener('DOMContentLoaded', () => {
   const quotaDisplay = document.getElementById('quotaDisplay');
   const memoryBadge = document.getElementById('memoryBadge');
 
-  // Cloud Burst / END CHAT Buttons
+  // Cloud Burst / New Chat / END CHAT Buttons
   const endChatBtn = document.getElementById('endChatBtn');
   const endChatHeaderBtn = document.getElementById('endChatHeaderBtn');
   const endChatOutputBtn = document.getElementById('endChatOutputBtn');
   const sidebarEndChatBtn = document.getElementById('sidebarEndChatBtn');
+  const newChatHeaderBtn = document.getElementById('newChatHeaderBtn');
   const cloudBurstToast = document.getElementById('cloudBurstToast');
+
+  // New Chat Confirmation Modal
+  const newChatConfirmModal = document.getElementById('newChatConfirmModal');
+  const newChatAgreeBtn = document.getElementById('newChatAgreeBtn');
+  const newChatDisagreeBtn = document.getElementById('newChatDisagreeBtn');
 
   // Output Card
   const outputCard = document.getElementById('outputCard');
@@ -54,6 +65,25 @@ document.addEventListener('DOMContentLoaded', () => {
   const copyDeliverableBtn = document.getElementById('copyDeliverableBtn');
   const exportPdfBtn = document.getElementById('exportPdfBtn');
   const newDeliberationBtn = document.getElementById('newDeliberationBtn');
+
+  // Arbiter Interactive Chat Card
+  const arbiterChatCard = document.getElementById('arbiterChatCard');
+  const arbiterChatStream = document.getElementById('arbiterChatStream');
+  const arbiterMsgInput = document.getElementById('arbiterMsgInput');
+  const arbiterSendBtn = document.getElementById('arbiterSendBtn');
+
+  // Support Modal & Admin Desk
+  const supportModal = document.getElementById('supportModal');
+  const closeSupportModalBtn = document.getElementById('closeSupportModalBtn');
+  const supportEmailInput = document.getElementById('supportEmailInput');
+  const supportCategorySelect = document.getElementById('supportCategorySelect');
+  const supportCommentInput = document.getElementById('supportCommentInput');
+  const supportSubmitBtn = document.getElementById('supportSubmitBtn');
+  const supportFeedbackStatus = document.getElementById('supportFeedbackStatus');
+  const adminToggleAuthBtn = document.getElementById('adminToggleAuthBtn');
+  const adminLockedNotice = document.getElementById('adminLockedNotice');
+  const adminTicketsContainer = document.getElementById('adminTicketsContainer');
+  const adminTicketsList = document.getElementById('adminTicketsList');
 
   // Auth Modal & Elements
   const authModal = document.getElementById('authModal');
@@ -128,14 +158,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. Purge project memory buffer
     engine.clearProjectMemory();
 
-    // 2. Clear inputs and staged files
+    // 2. Clear inputs, staging, and deliverable state
     if (queryInput) queryInput.value = '';
     attachedFiles = [];
     renderAttachedChips();
 
-    // 3. Reset output card
+    // 3. Reset output card and Arbiter discussion
     if (outputCard) outputCard.classList.remove('active');
     currentDeliverable = "";
+    arbiterHistory = [];
+    resetArbiterChat();
 
     // 4. Update memory indicator
     updateMemoryUI();
@@ -162,7 +194,41 @@ document.addEventListener('DOMContentLoaded', () => {
     toggleSidebar(false);
   });
 
-  // 6. Navigation & Scrolling Handlers
+  // 6. New Chat Confirmation Modal (Agree / Disagree)
+  function promptNewChat() {
+    const hasHistory = engine.getMemory().getTurnCount() > 0 || (queryInput && queryInput.value.trim()) || currentDeliverable;
+    if (hasHistory) {
+      if (newChatConfirmModal) newChatConfirmModal.style.display = 'flex';
+    } else {
+      executeCloudBurst();
+    }
+  }
+
+  if (newChatHeaderBtn) newChatHeaderBtn.addEventListener('click', promptNewChat);
+
+  if (newChatAgreeBtn) {
+    newChatAgreeBtn.addEventListener('click', () => {
+      if (newChatConfirmModal) newChatConfirmModal.style.display = 'none';
+      executeCloudBurst();
+    });
+  }
+
+  if (newChatDisagreeBtn) {
+    newChatDisagreeBtn.addEventListener('click', () => {
+      if (newChatConfirmModal) newChatConfirmModal.style.display = 'none';
+      scrollToPlayground();
+    });
+  }
+
+  // 7. Auto-Cleaning: Purge memory on tab close, navigate away, or web clear
+  window.addEventListener('beforeunload', () => {
+    engine.clearProjectMemory();
+  });
+  window.addEventListener('pagehide', () => {
+    engine.clearProjectMemory();
+  });
+
+  // 8. Navigation & Scrolling Handlers
   function scrollToPlayground() {
     const el = document.getElementById('playground');
     if (el) {
@@ -176,14 +242,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.querySelectorAll('a.nav-link').forEach(link => {
     link.addEventListener('click', (e) => {
+      const href = link.getAttribute('href');
+      if (href === '#support') {
+        e.preventDefault();
+        openSupportModal();
+        return;
+      }
       e.preventDefault();
-      const targetId = link.getAttribute('href').replace('#', '');
+      const targetId = href.replace('#', '');
       const targetEl = document.getElementById(targetId);
       if (targetEl) targetEl.scrollIntoView({ behavior: 'smooth' });
     });
   });
 
-  // 7. Authentication Modal Handlers (Strict Anti-Burner Validation)
+  // 9. Authentication Modal Handlers (Strict Anti-Burner Validation)
   function openAuthModal(alertMsg = "") {
     if (authAlertBox) {
       if (alertMsg) {
@@ -242,7 +314,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 8. Sidebar Drawer Handlers
+  // 10. Sidebar Drawer Handlers
   function toggleSidebar(open) {
     if (sidebarDrawer && sidebarBackdrop) {
       if (open) {
@@ -262,12 +334,13 @@ document.addEventListener('DOMContentLoaded', () => {
   if (logoutBtn) {
     logoutBtn.addEventListener('click', () => {
       security.signOut();
+      executeCloudBurst();
       toggleSidebar(false);
       syncAuthState();
     });
   }
 
-  // 9. Universal File Dropzone Handlers
+  // 11. Universal File Dropzone Handlers
   if (dropzone) {
     dropzone.addEventListener('click', () => {
       if (fileInput) fileInput.click();
@@ -318,7 +391,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 10. Fullscreen Dark Synapse Deliberation Execution
+  // 12. Fullscreen Dark Synapse Deliberation Execution
   if (submitBtn) {
     submitBtn.addEventListener('click', async () => {
       const query = (queryInput && queryInput.value.trim()) || "";
@@ -411,7 +484,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (synapseBarFill) synapseBarFill.style.width = `${pct}%`;
   }
 
-  // 11. Render Deliverable Output
+  // 13. Render Deliverable Output
   function renderDeliverable(fullResult, evalResult) {
     const evaluation = evalResult || (fullResult && fullResult.evaluation) || {
       verdict: "APPROVED",
@@ -440,7 +513,195 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // 12. Download, Copy & PDF Handlers
+  // 14. Interactive Arbiter Consultation Chat Handlers
+  function resetArbiterChat() {
+    if (!arbiterChatStream) return;
+    arbiterChatStream.innerHTML = `
+      <div class="arbiter-msg msg-arbiter">
+        <div class="msg-sender">⚖️ The Arbiter</div>
+        <div class="msg-bubble">
+          I have audited the Council's synthesis. You may consult with me directly:
+          <ul style="margin: 6px 0 0 18px;">
+            <li>Ask <strong>"Is the work done?"</strong> to evaluate completeness against all invariants.</li>
+            <li>Request <strong>modifications or changes</strong> to revise any section of the deliverable.</li>
+            <li>Conduct <strong>further technical discussion</strong> on this topic with full project memory.</li>
+          </ul>
+        </div>
+      </div>
+    `;
+    arbiterHistory = [];
+  }
+
+  function appendArbiterMessage(sender, content, isHtml = false) {
+    if (!arbiterChatStream) return null;
+    const msg = document.createElement('div');
+    msg.className = `arbiter-msg msg-${sender}`;
+    const name = sender === 'arbiter' ? '⚖️ The Arbiter' : '👤 You';
+    msg.innerHTML = `<div class="msg-sender">${name}</div><div class="msg-bubble">${isHtml ? content : escapeHtml(content)}</div>`;
+    arbiterChatStream.appendChild(msg);
+    arbiterChatStream.scrollTop = arbiterChatStream.scrollHeight;
+    return msg;
+  }
+
+  async function handleArbiterSend() {
+    const text = (arbiterMsgInput && arbiterMsgInput.value.trim()) || "";
+    if (!text) return;
+    arbiterMsgInput.value = "";
+
+    // Append user message bubble
+    appendArbiterMessage('user', text);
+    arbiterHistory.push({ role: 'user', content: text });
+
+    // Typing bubble
+    const typingEl = appendArbiterMessage('arbiter', '⚖️ The Arbiter is auditing consensus...');
+
+    try {
+      const result = await engine.arbiterConsultation({
+        message: text,
+        deliverable: currentDeliverable,
+        history: arbiterHistory
+      });
+
+      if (typingEl) typingEl.remove();
+
+      let bubbleHtml = result.reply.replace(/\n/g, '<br>');
+      if (result.updatedDeliverable) {
+        const btnId = `applyChangeBtn_${Date.now()}`;
+        bubbleHtml += `<br><button class="apply-change-btn" id="${btnId}">✨ Apply to Deliverable</button>`;
+      }
+
+      const msgEl = appendArbiterMessage('arbiter', bubbleHtml, true);
+      arbiterHistory.push({ role: 'assistant', content: result.reply });
+
+      if (result.updatedDeliverable) {
+        const btn = msgEl.querySelector('.apply-change-btn');
+        if (btn) {
+          btn.addEventListener('click', () => {
+            currentDeliverable = result.updatedDeliverable;
+            if (deliverableContent) deliverableContent.innerText = currentDeliverable;
+            btn.innerText = "✅ Changes Applied to Deliverable!";
+            btn.disabled = true;
+          });
+        }
+      }
+    } catch (err) {
+      if (typingEl) typingEl.remove();
+      appendArbiterMessage('arbiter', '⚠️ Error consulting Arbiter: ' + err.message);
+    }
+  }
+
+  if (arbiterSendBtn) arbiterSendBtn.addEventListener('click', handleArbiterSend);
+  if (arbiterMsgInput) {
+    arbiterMsgInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        handleArbiterSend();
+      }
+    });
+  }
+
+  // Quick intent chips
+  document.querySelectorAll('.arbiter-quick-chips .chip-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const intent = btn.getAttribute('data-intent');
+      if (intent === 'status') {
+        if (arbiterMsgInput) arbiterMsgInput.value = "Is the work done or not? Please evaluate completeness against all invariants.";
+        handleArbiterSend();
+      } else if (intent === 'modify') {
+        if (arbiterMsgInput) {
+          arbiterMsgInput.value = "I want to request the following changes: ";
+          arbiterMsgInput.focus();
+        }
+      } else if (intent === 'discuss') {
+        if (arbiterMsgInput) arbiterMsgInput.value = "Let's deliberate deeper on the theoretical nuances and key implementation tradeoffs.";
+        handleArbiterSend();
+      } else if (intent === 'audit') {
+        if (arbiterMsgInput) arbiterMsgInput.value = "Conduct an adversarial audit on boundary failure modes.";
+        handleArbiterSend();
+      }
+    });
+  });
+
+  // 15. Support Modal & Admin Resolution Desk
+  function openSupportModal() {
+    if (supportModal) supportModal.style.display = 'flex';
+    renderAdminTickets();
+  }
+
+  function closeSupportModal() {
+    if (supportModal) supportModal.style.display = 'none';
+  }
+
+  if (closeSupportModalBtn) closeSupportModalBtn.addEventListener('click', closeSupportModal);
+
+  if (supportSubmitBtn) {
+    supportSubmitBtn.addEventListener('click', () => {
+      const email = (supportEmailInput && supportEmailInput.value.trim()) || "";
+      const cat = (supportCategorySelect && supportCategorySelect.value) || "Issue on Web";
+      const comment = (supportCommentInput && supportCommentInput.value.trim()) || "";
+
+      try {
+        supportVault.submitTicket({ email, category: cat, comment });
+        if (supportFeedbackStatus) {
+          supportFeedbackStatus.style.display = 'block';
+          supportFeedbackStatus.style.color = '#34d399';
+          supportFeedbackStatus.innerText = '✅ Your problem report has been submitted! Admin (SKAMAN-07) will review and reply to your email.';
+        }
+        if (supportCommentInput) supportCommentInput.value = '';
+        renderAdminTickets();
+      } catch (err) {
+        if (supportFeedbackStatus) {
+          supportFeedbackStatus.style.display = 'block';
+          supportFeedbackStatus.style.color = '#f43f5e';
+          supportFeedbackStatus.innerText = '⚠️ ' + err.message;
+        }
+      }
+    });
+  }
+
+  function renderAdminTickets() {
+    const isAdmin = supportVault.isAdmin(security.currentUser);
+    if (adminLockedNotice) adminLockedNotice.style.display = isAdmin ? 'none' : 'block';
+    if (adminTicketsContainer) adminTicketsContainer.style.display = isAdmin ? 'block' : 'none';
+    if (adminToggleAuthBtn) adminToggleAuthBtn.innerText = isAdmin ? 'Lock Admin' : 'Unlock Admin';
+
+    if (!isAdmin || !adminTicketsList) return;
+
+    const tickets = supportVault.getTicketsForDisplay(security.currentUser);
+    if (tickets.length === 0) {
+      adminTicketsList.innerHTML = '<div style="font-size:12px;color:var(--text-muted);padding:8px;">No support tickets submitted yet.</div>';
+      return;
+    }
+
+    adminTicketsList.innerHTML = tickets.map(t => `
+      <div class="admin-ticket-card">
+        <div class="admin-ticket-email">
+          <span>📧 ${escapeHtml(t.email)}</span>
+          <a href="mailto:${encodeURIComponent(t.email)}?subject=Hive Support Resolution: ${encodeURIComponent(t.category)}" class="btn btn-primary btn-xs">✉️ Mail Back Submitter</a>
+        </div>
+        <div style="font-size:11px;color:var(--text-muted);font-family:'JetBrains Mono',monospace;">Category: ${escapeHtml(t.category)} • Status: ${t.status}</div>
+        <div class="admin-ticket-body">${escapeHtml(t.comment)}</div>
+      </div>
+    `).join('');
+  }
+
+  if (adminToggleAuthBtn) {
+    adminToggleAuthBtn.addEventListener('click', () => {
+      if (supportVault.isAdmin(security.currentUser)) {
+        supportVault.lockAdmin();
+      } else {
+        const pass = prompt("Enter Administrator Passcode (SKAMAN-07):");
+        if (pass && supportVault.unlockAdmin(pass)) {
+          alert("Admin Desk Unlocked for SKAMAN-07.");
+        } else if (pass) {
+          alert("Unauthorized passcode.");
+        }
+      }
+      renderAdminTickets();
+    });
+  }
+
+  // 16. Download, Copy & PDF Handlers
   if (downloadDeliverableBtn) {
     downloadDeliverableBtn.addEventListener('click', () => {
       if (!currentDeliverable) {
@@ -479,14 +740,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Continue within same project (preserving memory)
+  // New Deliberation trigger checks confirmation
   if (newDeliberationBtn) {
     newDeliberationBtn.addEventListener('click', () => {
-      if (queryInput) queryInput.value = '';
-      attachedFiles = [];
-      renderAttachedChips();
-      if (outputCard) outputCard.classList.remove('active');
-      scrollToPlayground();
+      promptNewChat();
     });
   }
 
