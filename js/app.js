@@ -393,12 +393,34 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  const MAX_FILE_SIZE_BYTES = 20 * 1024 * 1024; // 20 MB limit
+  const MAX_ATTACHED_FILES = 10;
+  const BLOCKED_EXTENSIONS = new Set(['exe', 'dll', 'bat', 'cmd', 'sh', 'vbs', 'msi', 'scr', 'ps1', 'com', 'pif', 'hta', 'cpl']);
+
   function handleFiles(files) {
-    files.forEach(f => {
+    if (!files || files.length === 0) return;
+
+    for (const f of files) {
+      if (attachedFiles.length >= MAX_ATTACHED_FILES) {
+        alert(`Attachment limit reached: Maximum ${MAX_ATTACHED_FILES} files allowed.`);
+        break;
+      }
+
+      if (f.size > MAX_FILE_SIZE_BYTES) {
+        alert(`File "${f.name}" exceeds the maximum 20MB size limit.`);
+        continue;
+      }
+
+      const ext = (f.name.split('.').pop() || '').toLowerCase();
+      if (BLOCKED_EXTENSIONS.has(ext)) {
+        alert(`Executable or script files (.${ext}) are not permitted for security.`);
+        continue;
+      }
+
       if (!attachedFiles.some(existing => existing.name === f.name)) {
         attachedFiles.push(f);
       }
-    });
+    }
     renderAttachedChips();
   }
 
@@ -1003,7 +1025,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <span>📧 ${escapeHtml(t.email)}</span>
           <a href="mailto:${encodeURIComponent(t.email)}?subject=Hive Support Resolution: ${encodeURIComponent(t.category)}" class="btn btn-primary btn-xs">✉️ Mail Back Submitter</a>
         </div>
-        <div style="font-size:11px;color:var(--text-muted);font-family:'JetBrains Mono',monospace;">Category: ${escapeHtml(t.category)} • Status: ${t.status}</div>
+        <div style="font-size:11px;color:var(--text-muted);font-family:'JetBrains Mono',monospace;">Category: ${escapeHtml(t.category)} • Status: ${escapeHtml(t.status)}</div>
         <div class="admin-ticket-body">${escapeHtml(t.comment)}</div>
       </div>
     `).join('');

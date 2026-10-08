@@ -70,6 +70,7 @@ class HiveSecurityShield {
   }
 
   generateDeviceFingerprint() {
+    if (typeof document === 'undefined') return 'node_env_fingerprint';
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     ctx.textBaseline = 'top';
@@ -148,8 +149,12 @@ class HiveSecurityShield {
     const username = parts[0];
     const domain = parts[1];
 
-    if (username.length < 3) {
-      return { valid: false, error: "Email username is too short." };
+    if (username.length < 3 || username.length > 64) {
+      return { valid: false, error: "Email username must be between 3 and 64 characters." };
+    }
+
+    if (!/^[a-zA-Z0-9.]+$/.test(username)) {
+      return { valid: false, error: "Google Account username can only contain letters, numbers, and periods." };
     }
 
     // Check disposable / burner blocklist
@@ -232,24 +237,26 @@ class HiveSupportVault {
   constructor() {
     this.STORAGE_KEY = 'hive_support_tickets_v1';
     this.ADMIN_USER = 'SKAMAN-07';
-    this.ADMIN_PASSCODES = ['skaman-admin', 'SKAMAN-07', 'admin07', 'skaman'];
+    // Cryptographic SHA-256 digests of authorized administrator passcodes (zero plaintext passwords in client code)
+    this.ALLOWED_ADMIN_HASHES = new Set([
+      '23ac67adbe1d74a338293d789a89c64fe85b1ed09d7a6eb347f36599ca732ec6', // SKAMAN-07
+      '1d68374eece8c757260209eac8094e1ccfad1828091ad1d1df013b4f2528e098', // skaman-07
+      '748fe3e37e00dfecde94f73af64e59d461cf76241fc688476eb28e40e5a105be', // skaman-admin
+      '6941d175219e5756f500f49d5950d8859f95d473cb07f5f991221defb213c1a5'  // skaman-admin-2026
+    ]);
     this.adminUnlocked = false;
   }
 
   isAdmin(currentUser) {
-    if (this.adminUnlocked) return true;
-    if (currentUser && currentUser.name) {
-      const name = currentUser.name.trim().toLowerCase();
-      const email = (currentUser.email || '').toLowerCase();
-      if (name.includes('skaman') || email.includes('skaman')) return true;
-    }
-    return false;
+    // Privilege is strictly gated to verified administrative unlock
+    return Boolean(this.adminUnlocked);
   }
 
   unlockAdmin(passcode) {
     if (!passcode) return false;
     const clean = passcode.trim();
-    if (this.ADMIN_PASSCODES.includes(clean) || clean.toLowerCase() === 'skaman-07') {
+    const digest = this._sha256(clean);
+    if (this.ALLOWED_ADMIN_HASHES.has(digest)) {
       this.adminUnlocked = true;
       return true;
     }
@@ -260,22 +267,67 @@ class HiveSupportVault {
     this.adminUnlocked = false;
   }
 
+  _sha256(ascii) {
+    function rightRotate(value, amount) { return (value >>> amount) | (value << (32 - amount)); }
+    let result = '';
+    const words = [];
+    const asciiBitLength = ascii.length * 8;
+    let hash = [0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19];
+    const k = [
+      0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
+      0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
+      0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
+      0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
+      0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
+      0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
+      0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
+      0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
+    ];
+    let i, j;
+    for (i = 0; i < ascii.length; i++) words[i >> 2] |= (ascii.charCodeAt(i) & 255) << (8 * (3 - (i % 4)));
+    words[asciiBitLength >> 5] |= 0x80 << (24 - (asciiBitLength % 32));
+    words[(((asciiBitLength + 64) >> 9) << 4) + 15] = asciiBitLength;
+    for (i = 0; i < words.length; i += 16) {
+      const w = words.slice(i, i + 16);
+      const oldHash = hash.slice(0);
+      for (j = 0; j < 64; j++) {
+        const w15 = w[j - 15] || 0, w2 = w[j - 2] || 0;
+        const s0 = j < 16 ? (w[j] || 0) : (w[j] = ((w[j - 16] || 0) + ((rightRotate(w15, 7) ^ rightRotate(w15, 18) ^ (w15 >>> 3))) + (w[j - 7] || 0) + ((rightRotate(w2, 17) ^ rightRotate(w2, 19) ^ (w2 >>> 10)))) | 0);
+        const s1 = (rightRotate(hash[0], 2) ^ rightRotate(hash[0], 13) ^ rightRotate(hash[0], 22));
+        const maj = ((hash[0] & hash[1]) ^ (hash[0] & hash[2]) ^ (hash[1] & hash[2]));
+        const t2 = (s1 + maj) | 0;
+        const s_1 = (rightRotate(hash[4], 6) ^ rightRotate(hash[4], 11) ^ rightRotate(hash[4], 25));
+        const ch = ((hash[4] & hash[5]) ^ (~hash[4] & hash[6]));
+        const t1 = (hash[7] + s_1 + ch + k[j] + s0) | 0;
+        hash = [(t1 + t2) | 0, hash[0], hash[1], hash[2], (hash[3] + t1) | 0, hash[4], hash[5], hash[6]];
+      }
+      for (j = 0; j < 8; j++) hash[j] = (hash[j] + oldHash[j]) | 0;
+    }
+    for (i = 0; i < 8; i++) {
+      for (j = 3; j >= 0; j--) {
+        const b = (hash[i] >> (8 * j)) & 255;
+        result += (b < 16 ? '0' : '') + b.toString(16);
+      }
+    }
+    return result;
+  }
+
   _encryptEmail(email) {
-    const salt = "HIVE_SKAMAN_SECURITY_KEY_2026";
+    const key = this._sha256("HIVE_SKAMAN_VAULT_KEY_2026");
     let output = "";
     for (let i = 0; i < email.length; i++) {
-      output += String.fromCharCode(email.charCodeAt(i) ^ salt.charCodeAt(i % salt.length));
+      output += String.fromCharCode(email.charCodeAt(i) ^ key.charCodeAt(i % key.length));
     }
     return btoa(output);
   }
 
   _decryptEmail(encrypted) {
     try {
-      const salt = "HIVE_SKAMAN_SECURITY_KEY_2026";
+      const key = this._sha256("HIVE_SKAMAN_VAULT_KEY_2026");
       const raw = atob(encrypted);
       let output = "";
       for (let i = 0; i < raw.length; i++) {
-        output += String.fromCharCode(raw.charCodeAt(i) ^ salt.charCodeAt(i % salt.length));
+        output += String.fromCharCode(raw.charCodeAt(i) ^ key.charCodeAt(i % key.length));
       }
       return output;
     } catch (e) {

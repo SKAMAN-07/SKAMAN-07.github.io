@@ -110,7 +110,11 @@ class MultiModelEngine {
 
   setGatewayUrl(url, apiKey = null, model = null) {
     if (url) {
-      this.localGatewayUrl = url.trim();
+      const trimmed = url.trim();
+      if (!/^https?:\/\//i.test(trimmed)) {
+        throw new Error('Gateway URL must begin with http:// or https://');
+      }
+      this.localGatewayUrl = trimmed;
       localStorage.setItem('hive_gateway_url', this.localGatewayUrl);
     }
     if (apiKey !== null) {

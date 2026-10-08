@@ -235,6 +235,34 @@ async function runTests() {
   assert.strictEqual(mem.getTurnCount(), 0);
   console.log('✓ Cloud burst verified');
 
+  // Test 10: Security Controls & Hardening Verification
+  console.log('Test 10: Security Controls & Hardening Verification');
+  const authCode = fs.readFileSync('./js/auth_security.js', 'utf8');
+  eval(authCode);
+  const { HiveSecurityShield, HiveSupportVault } = window;
+
+  const shield = new HiveSecurityShield();
+  assert.strictEqual(shield.validateGoogleAccount('user@burnermail.io').valid, false);
+  assert.strictEqual(shield.validateGoogleAccount('user@yahoo.com').valid, false);
+  assert.strictEqual(shield.validateGoogleAccount('valid.user@gmail.com').valid, true);
+  assert.strictEqual(shield.validateGoogleAccount('bad<script>@gmail.com').valid, false);
+
+  // Gateway URL protocol enforcement
+  assert.throws(() => {
+    engine.setGatewayUrl('javascript:alert(1)');
+  }, /Gateway URL must begin with http:\/\/ or https:\/\//);
+
+  // Admin privilege isolation (No substring escalation)
+  const vault = new HiveSupportVault();
+  assert.strictEqual(vault.isAdmin({ name: 'skaman attacker', email: 'attacker@gmail.com' }), false);
+  assert.strictEqual(vault.unlockAdmin('wrong-passcode'), false);
+  assert.strictEqual(vault.isAdmin(null), false);
+  assert.strictEqual(vault.unlockAdmin('SKAMAN-07'), true);
+  assert.strictEqual(vault.isAdmin(null), true);
+  vault.lockAdmin();
+  assert.strictEqual(vault.isAdmin(null), false);
+  console.log('✓ Security hardening and isolation verified');
+
   console.log('=== ALL TESTS PASSED SUCCESSFULLY! ===');
 }
 
