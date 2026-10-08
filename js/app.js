@@ -72,6 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const gatewayModal = document.getElementById('gatewayModal');
   const closeGatewayModalBtn = document.getElementById('closeGatewayModalBtn');
   const gatewayUrlInput = document.getElementById('gatewayUrlInput');
+  const gatewayModelSelect = document.getElementById('gatewayModelSelect');
   const gatewayApiKeyInput = document.getElementById('gatewayApiKeyInput');
   const testGatewayBtn = document.getElementById('testGatewayBtn');
   const saveGatewayBtn = document.getElementById('saveGatewayBtn');
@@ -615,12 +616,13 @@ document.addEventListener('DOMContentLoaded', () => {
       <div class="arbiter-msg msg-arbiter">
         <div class="msg-sender">⚖️ The Arbiter</div>
         <div class="msg-bubble">
-          I am The Arbiter, executive leader of the Multi-Model Frontier Council. I have audited our synthesis and am here to collaborate with you directly:
-          <ul style="margin: 6px 0 0 18px;">
-            <li>Ask <strong>"Where is the work?"</strong> to get a complete executive walkthrough of the deliverable right here.</li>
-            <li>Ask <strong>"Is the work done?"</strong> to review completeness against all invariants and benchmarks.</li>
-            <li>Request <strong>modifications or additions</strong> to revise any part of the deliverable.</li>
-            <li>Ask <strong>in-depth questions</strong> about the topic, risks, valuation, or technical mechanics.</li>
+          Hello! I am The Arbiter, executive leader of the Multi-Model Frontier Council. The deliberation is finalized and the complete deliverable is rendered in the window directly above this chat.
+          <p style="margin: 8px 0 4px 0;">I am here to collaborate with you directly as a colleague:</p>
+          <ul style="margin: 4px 0 0 18px;">
+            <li>Click <strong>"📖 Where is the work?"</strong> to get a complete, structured executive walkthrough right here in chat.</li>
+            <li>Ask <strong>"Is the work done?"</strong> for a full audit of completed sections and invariants.</li>
+            <li>Ask <strong>in-depth questions</strong> about the domain, valuation, formulas, or risks.</li>
+            <li>Tell me what <strong>revisions or additions</strong> you need, and I will update the deliverable immediately.</li>
           </ul>
         </div>
       </div>
@@ -725,6 +727,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function openGatewayModal() {
     if (gatewayUrlInput) gatewayUrlInput.value = engine.localGatewayUrl;
     if (gatewayApiKeyInput) gatewayApiKeyInput.value = engine.gatewayApiKey;
+    if (gatewayModelSelect) gatewayModelSelect.value = engine.gatewayModel || 'auto';
     if (gatewayStatusNotice) gatewayStatusNotice.style.display = 'none';
     if (gatewayModal) gatewayModal.style.display = 'flex';
   }
@@ -740,7 +743,8 @@ document.addEventListener('DOMContentLoaded', () => {
     testGatewayBtn.addEventListener('click', async () => {
       const url = (gatewayUrlInput && gatewayUrlInput.value.trim()) || "http://localhost:20128/v1";
       const key = (gatewayApiKeyInput && gatewayApiKeyInput.value.trim()) || "sk_omniroute";
-      engine.setGatewayUrl(url, key);
+      const model = (gatewayModelSelect && gatewayModelSelect.value) || "auto";
+      engine.setGatewayUrl(url, key, model);
       testGatewayBtn.innerText = "Testing...";
       testGatewayBtn.disabled = true;
 
@@ -754,12 +758,12 @@ document.addEventListener('DOMContentLoaded', () => {
           gatewayStatusNotice.style.background = 'rgba(16, 185, 129, 0.15)';
           gatewayStatusNotice.style.border = '1px solid #10b981';
           gatewayStatusNotice.style.color = '#34d399';
-          gatewayStatusNotice.innerHTML = `✅ <strong>Connected!</strong> OmniRoute gateway active at <code>${health.url}</code>. Council will use live frontier models.`;
+          gatewayStatusNotice.innerHTML = `✅ <strong>Connected!</strong> OmniRoute gateway active at <code>${health.url}</code> (Model: <code>${model}</code>). Deliberations and Arbiter chat will use live models.`;
         } else {
           gatewayStatusNotice.style.background = 'rgba(239, 68, 68, 0.15)';
           gatewayStatusNotice.style.border = '1px solid #ef4444';
           gatewayStatusNotice.style.color = '#f87171';
-          gatewayStatusNotice.innerHTML = `⚠️ <strong>Gateway Offline.</strong> Could not reach <code>${url}</code>. Built-in neural reasoning engine will handle deliberations.`;
+          gatewayStatusNotice.innerHTML = `⚠️ <strong>Gateway Offline or Blocked by Browser.</strong> Could not reach <code>${url}</code>. Built-in neural reasoning engine will handle deliberations and chat with zero interruption.`;
         }
       }
       syncAuthState();
@@ -770,7 +774,8 @@ document.addEventListener('DOMContentLoaded', () => {
     saveGatewayBtn.addEventListener('click', () => {
       const url = (gatewayUrlInput && gatewayUrlInput.value.trim()) || "http://localhost:20128/v1";
       const key = (gatewayApiKeyInput && gatewayApiKeyInput.value.trim()) || "sk_omniroute";
-      engine.setGatewayUrl(url, key);
+      const model = (gatewayModelSelect && gatewayModelSelect.value) || "auto";
+      engine.setGatewayUrl(url, key, model);
       syncAuthState();
       closeGatewayModal();
     });

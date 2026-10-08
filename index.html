@@ -217,11 +217,13 @@
             <div class="arbiter-msg msg-arbiter">
               <div class="msg-sender">⚖️ The Arbiter</div>
               <div class="msg-bubble">
-                I have audited the Council's synthesis. You may consult with me directly:
-                <ul style="margin: 6px 0 0 18px;">
-                  <li>Ask <strong>"Is the work done?"</strong> to evaluate completeness against all invariants.</li>
-                  <li>Request <strong>modifications or changes</strong> to revise any section of the deliverable.</li>
-                  <li>Conduct <strong>further technical discussion</strong> on this topic with full project memory.</li>
+                Hello! I am The Arbiter, executive leader of the Multi-Model Frontier Council. The deliberation is finalized and the complete deliverable is rendered in the window directly above this chat.
+                <p style="margin: 8px 0 4px 0;">I am here to collaborate with you directly as a colleague:</p>
+                <ul style="margin: 4px 0 0 18px;">
+                  <li>Click <strong>"📖 Where is the work?"</strong> to get a complete, structured executive walkthrough right here in chat.</li>
+                  <li>Ask <strong>"Is the work done?"</strong> for a full audit of completed sections and invariants.</li>
+                  <li>Ask <strong>in-depth questions</strong> about the domain, valuation, formulas, or risks.</li>
+                  <li>Tell me what <strong>revisions or additions</strong> you need, and I will update the deliverable immediately.</li>
                 </ul>
               </div>
             </div>
@@ -568,9 +570,33 @@
         <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Default OmniRoute dev server runs on port 20128.</div>
       </div>
 
-      <div style="margin-bottom: 16px;">
+      <div style="margin-bottom: 12px;">
+        <label class="support-label">Model Selection</label>
+        <select id="gatewayModelSelect" class="support-input">
+          <option value="auto">auto (OmniRoute Auto Router — Zero Config / Free)</option>
+          <option value="openrouter/free">openrouter/free (OpenRouter Free Pool)</option>
+          <option value="gpt-4o-mini">gpt-4o-mini (OpenAI Fast)</option>
+          <option value="deepseek-r1">deepseek-r1 (DeepSeek Reasoning)</option>
+          <option value="claude-3-7-sonnet">claude-3-7-sonnet (Claude 3.7 Sonnet)</option>
+          <option value="mistral">mistral (Mistral AI)</option>
+        </select>
+        <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">'auto' connects out-of-the-box with OmniRoute's built-in keyless providers.</div>
+      </div>
+
+      <div style="margin-bottom: 14px;">
         <label class="support-label">API Key / Token (Optional)</label>
         <input type="password" id="gatewayApiKeyInput" class="support-input" placeholder="sk_omniroute or custom key" value="sk_omniroute">
+      </div>
+
+      <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-subtle); border-radius: 6px; padding: 10px 12px; margin-bottom: 14px; font-size: 12px; color: var(--text-secondary); line-height: 1.5;">
+        🔒 <strong>GitHub Pages &amp; Localhost Security Note:</strong><br>
+        Modern browsers restrict plain HTTP requests (<code>http://localhost:20128</code>) from HTTPS sites (Mixed Content security). If connecting to local OmniRoute from GitHub Pages:
+        <ul style="margin: 4px 0 0 16px;">
+          <li>Allow "Insecure content" in site settings for this domain, or</li>
+          <li>Route OmniRoute through an HTTPS tunnel (e.g. <code>cloudflared</code> or <code>ngrok http 20128</code>) and enter the HTTPS URL, or</li>
+          <li>Run the web app locally on <code>http://localhost</code>.</li>
+        </ul>
+        <em>When the gateway is offline or unreachable, Hive seamlessly uses its high-capacity built-in neural reasoning engine.</em>
       </div>
 
       <div style="display: flex; gap: 10px; margin-bottom: 12px;">
