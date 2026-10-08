@@ -67,6 +67,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const exportPdfBtn = document.getElementById('exportPdfBtn');
   const newDeliberationBtn = document.getElementById('newDeliberationBtn');
 
+  // Deliberation Mode Tabs & AI Council Answers Feed
+  const tabDeliverableBtn = document.getElementById('tabDeliverableBtn');
+  const tabCouncilAnswersBtn = document.getElementById('tabCouncilAnswersBtn');
+  const deliverablePanel = document.getElementById('deliverablePanel');
+  const councilAnswersPanel = document.getElementById('councilAnswersPanel');
+  const councilAnswersFeed = document.getElementById('councilAnswersFeed');
+  const councilTelemetryStrip = document.getElementById('councilTelemetryStrip');
+  let currentTranscript = [];
+
   // Gateway Modal & Controls
   const gatewayModalBtn = document.getElementById('gatewayModalBtn');
   const gatewayModal = document.getElementById('gatewayModal');
@@ -181,6 +190,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // 3. Reset output card and Arbiter discussion
     if (outputCard) outputCard.classList.remove('active');
     currentDeliverable = "";
+    currentTranscript = [];
+    if (councilAnswersFeed) councilAnswersFeed.innerHTML = "";
+    switchDeliberationTab('deliverable');
     arbiterHistory = [];
     resetArbiterChat();
 
@@ -563,8 +575,122 @@ document.addEventListener('DOMContentLoaded', () => {
     return text;
   }
 
-  // 14. Render Deliverable Output
+  // 14. Render Deliverable Output & AI Council Answers
   let isFormattedView = true;
+
+  function switchDeliberationTab(mode) {
+    if (mode === 'deliverable') {
+      if (tabDeliverableBtn) tabDeliverableBtn.classList.add('active');
+      if (tabCouncilAnswersBtn) tabCouncilAnswersBtn.classList.remove('active');
+      if (deliverablePanel) {
+        deliverablePanel.style.display = 'block';
+        deliverablePanel.classList.add('active');
+      }
+      if (councilAnswersPanel) {
+        councilAnswersPanel.style.display = 'none';
+        councilAnswersPanel.classList.remove('active');
+      }
+    } else if (mode === 'council') {
+      if (tabCouncilAnswersBtn) tabCouncilAnswersBtn.classList.add('active');
+      if (tabDeliverableBtn) tabDeliverableBtn.classList.remove('active');
+      if (deliverablePanel) {
+        deliverablePanel.style.display = 'none';
+        deliverablePanel.classList.remove('active');
+      }
+      if (councilAnswersPanel) {
+        councilAnswersPanel.style.display = 'block';
+        councilAnswersPanel.classList.add('active');
+      }
+    }
+  }
+
+  if (tabDeliverableBtn) {
+    tabDeliverableBtn.addEventListener('click', () => switchDeliberationTab('deliverable'));
+  }
+  if (tabCouncilAnswersBtn) {
+    tabCouncilAnswersBtn.addEventListener('click', () => switchDeliberationTab('council'));
+  }
+
+  function getNodeColor(role) {
+    switch (role) {
+      case 'architect': return '#60a5fa';
+      case 'skeptic': return '#f87171';
+      case 'verifier': return '#fbbf24';
+      case 'synthesizer': return '#a78bfa';
+      case 'arbiter': return '#34d399';
+      default: return '#da7756';
+    }
+  }
+
+  function renderCouncilAnswers(transcript) {
+    if (!councilAnswersFeed) return;
+    councilAnswersFeed.innerHTML = '';
+
+    if (!transcript || transcript.length === 0) {
+      councilAnswersFeed.innerHTML = `
+        <div style="text-align: center; padding: 30px; color: var(--text-muted); font-size: 14px;">
+          The AI Council has not yet convened for this session. Submit your inquiry above to review direct model council answers.
+        </div>
+      `;
+      return;
+    }
+
+    transcript.forEach(step => {
+      const card = document.createElement('div');
+      card.className = 'council-answer-card';
+      const role = step.role_type || 'architect';
+      card.id = `councilCard-${role}`;
+
+      const roleBadgeClass = `role-badge-${role}`;
+      const roleLabel = role.toUpperCase();
+
+      const header = document.createElement('div');
+      header.className = 'council-answer-header';
+      header.innerHTML = `
+        <div class="council-answer-node-info">
+          <span class="node-dot" style="background: ${getNodeColor(role)};"></span>
+          <span class="council-answer-node-name">${escapeHtml(step.sender || 'Council Node')}</span>
+        </div>
+        <span class="council-answer-role-badge ${roleBadgeClass}">${roleLabel}</span>
+      `;
+
+      const body = document.createElement('div');
+      body.className = 'council-answer-body formatted';
+      body.innerHTML = formatMarkdownToHtml(step.content || '');
+
+      card.appendChild(header);
+      card.appendChild(body);
+      councilAnswersFeed.appendChild(card);
+    });
+  }
+
+  // Interactivity for top console telemetry strip: click any model node to navigate to its perspective
+  if (councilTelemetryStrip) {
+    const nodes = councilTelemetryStrip.querySelectorAll('.telemetry-node');
+    nodes.forEach(node => {
+      node.addEventListener('click', () => {
+        const role = node.getAttribute('data-role');
+        if (role === 'arbiter') {
+          if (arbiterChatCard) {
+            arbiterChatCard.scrollIntoView({ behavior: 'smooth' });
+          } else if (outputCard) {
+            outputCard.scrollIntoView({ behavior: 'smooth' });
+          }
+        } else if (['architect', 'skeptic', 'verifier', 'synthesizer'].includes(role)) {
+          switchDeliberationTab('council');
+          if (outputCard) outputCard.scrollIntoView({ behavior: 'smooth' });
+          const targetCard = document.getElementById(`councilCard-${role}`);
+          if (targetCard) {
+            targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            targetCard.classList.add('highlighted');
+            setTimeout(() => {
+              targetCard.classList.remove('highlighted');
+            }, 2500);
+          }
+        }
+      });
+    });
+  }
 
   function updateDeliverableView() {
     if (!deliverableContent) return;
@@ -588,6 +714,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     currentDeliverable = evaluation.final_output || currentDeliverable || "";
+    currentTranscript = (fullResult && fullResult.transcript) || currentTranscript || [];
 
     if (outputVerdictBadge) {
       outputVerdictBadge.innerText = `${evaluation.verdict} (Score: ${evaluation.score || 98}/100)`;
@@ -598,6 +725,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     updateDeliverableView();
+    renderCouncilAnswers(currentTranscript);
+    switchDeliberationTab('deliverable');
 
     if (outputCard) {
       outputCard.classList.add('active');

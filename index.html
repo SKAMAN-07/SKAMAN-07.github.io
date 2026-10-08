@@ -88,24 +88,24 @@
           </div>
 
           <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-            <div class="council-telemetry-strip">
-              <div class="telemetry-node node-arbiter">
+            <div class="council-telemetry-strip" id="councilTelemetryStrip">
+              <div class="telemetry-node node-arbiter" data-role="arbiter" title="The Arbiter — Executive Verdict &amp; Consultation Desk">
                 <span class="node-dot"></span>
                 <span>Arbiter</span>
               </div>
-              <div class="telemetry-node node-architect">
+              <div class="telemetry-node node-architect" data-role="architect" title="The Architect [Claude 3.7 Sonnet] — Structural Architecture Answer">
                 <span class="node-dot"></span>
                 <span>Architect</span>
               </div>
-              <div class="telemetry-node node-skeptic">
+              <div class="telemetry-node node-skeptic" data-role="skeptic" title="The Skeptic [DeepSeek-R1] — Adversarial Stress-Test &amp; Risks Answer">
                 <span class="node-dot"></span>
                 <span>Skeptic</span>
               </div>
-              <div class="telemetry-node node-verifier">
+              <div class="telemetry-node node-verifier" data-role="verifier" title="The Verifier [GPT-4o] — Quantitative Proofs &amp; Invariants Answer">
                 <span class="node-dot"></span>
                 <span>Verifier</span>
               </div>
-              <div class="telemetry-node node-synthesizer">
+              <div class="telemetry-node node-synthesizer" data-role="synthesizer" title="The Synthesizer [Claude 3.5 Sonnet] — Consolidated Consensus Answer">
                 <span class="node-dot"></span>
                 <span>Synthesizer</span>
               </div>
@@ -141,7 +141,7 @@
         <!-- Console Action Controls -->
         <div class="console-actions-bar">
           <div class="engine-indicator" id="quotaDisplay">
-            <span class="pill-dot"></span> Frontier Multi-Model Active • Zero Setup Hassle
+            <span class="pill-dot"></span> Built-in AI Council Active (Offline First)
           </div>
           <div class="console-actions-right" style="display: flex; gap: 10px; align-items: center;">
             <button class="btn btn-danger" id="endChatBtn" title="Cloud Burst: Reset project memory and chat history">
@@ -174,16 +174,43 @@
           </p>
         </div>
 
-        <!-- Readable Deliverable Content -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-          <h4 style="margin: 0; font-size: 15px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted);">
-            Verified Deliverable Output
-          </h4>
-          <button class="btn btn-outline btn-xs" id="toggleViewFormatBtn" style="padding: 3px 10px; font-size: 11px;">
-            📄 Formatted View
+        <!-- Deliberation Mode Tabs: Deliverable Result vs AI Council Answers -->
+        <div class="deliberation-mode-tabs" id="deliberationModeTabs">
+          <button class="delib-mode-tab active" id="tabDeliverableBtn" data-target="deliverable">
+            📄 Verified Deliverable (Result)
+          </button>
+          <button class="delib-mode-tab" id="tabCouncilAnswersBtn" data-target="council">
+            🏛️ AI Council Answers &amp; Perspectives
           </button>
         </div>
-        <div class="deliverable-content formatted" id="deliverableContent"></div>
+
+        <!-- Tab Panel 1: Verified Deliverable Content (Pure result of user query) -->
+        <div class="delib-tab-panel active" id="deliverablePanel">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <h4 style="margin: 0; font-size: 15px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted);">
+              Verified Deliverable Output
+            </h4>
+            <button class="btn btn-outline btn-xs" id="toggleViewFormatBtn" style="padding: 3px 10px; font-size: 11px;">
+              📄 Formatted View
+            </button>
+          </div>
+          <div class="deliverable-content formatted" id="deliverableContent"></div>
+        </div>
+
+        <!-- Tab Panel 2: AI Council Answers (Direct answers from each AI member) -->
+        <div class="delib-tab-panel" id="councilAnswersPanel" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h4 style="margin: 0; font-size: 15px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted);">
+              Direct Answers from the AI Council
+            </h4>
+            <span style="font-size: 12px; color: var(--text-muted);">
+              Concrete answers targeting your request across 4 specialized model nodes
+            </span>
+          </div>
+          <div class="council-answers-feed" id="councilAnswersFeed">
+            <!-- Populated dynamically with rich cards for Architect, Skeptic, Verifier, Synthesizer -->
+          </div>
+        </div>
 
         <!-- ============================================================== -->
         <!-- INTERACTIVE ARBITER DELIBERATION & MODIFICATION CHAT WINDOW    -->

@@ -1460,3 +1460,147 @@ p {
   padding: 4px 8px;
   font-size: 11px;
 }
+
+/* ============================================================== */
+/* DELIBERATION MODE TABS & COUNCIL ANSWERS FEED                  */
+/* ============================================================== */
+.deliberation-mode-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 12px;
+}
+
+.delib-mode-tab {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  padding: 8px 18px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.delib-mode-tab:hover {
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--text-primary);
+  border-color: var(--border-medium);
+}
+
+.delib-mode-tab.active {
+  background: rgba(218, 119, 86, 0.15);
+  color: var(--coral-primary);
+  border-color: var(--coral-primary);
+}
+
+/* Council Answers Feed */
+.council-answers-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.council-answer-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 22px;
+  transition: all 0.25s ease;
+}
+
+.council-answer-card:hover {
+  border-color: var(--border-medium);
+}
+
+.council-answer-card.highlighted {
+  border-color: var(--coral-primary);
+  box-shadow: 0 0 20px rgba(218, 119, 86, 0.25);
+}
+
+.council-answer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-subtle);
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.council-answer-node-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.council-answer-node-info .node-dot {
+  width: 9px;
+  height: 9px;
+}
+
+.council-answer-node-name {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--text-primary);
+}
+
+.council-answer-role-badge {
+  font-size: 11px;
+  font-family: "JetBrains Mono", monospace;
+  padding: 3px 8px;
+  border-radius: var(--radius-xs);
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.role-badge-architect {
+  background: rgba(96, 165, 250, 0.15);
+  color: #60a5fa;
+  border: 1px solid rgba(96, 165, 250, 0.3);
+}
+
+.role-badge-skeptic {
+  background: rgba(248, 113, 113, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(248, 113, 113, 0.3);
+}
+
+.role-badge-verifier {
+  background: rgba(251, 191, 36, 0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(251, 191, 36, 0.3);
+}
+
+.role-badge-synthesizer {
+  background: rgba(167, 139, 250, 0.15);
+  color: #a78bfa;
+  border: 1px solid rgba(167, 139, 250, 0.3);
+}
+
+.council-answer-body {
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--text-primary);
+}
+
+/* Interactivity for top console telemetry strip */
+.telemetry-node {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.telemetry-node:hover {
+  transform: translateY(-2px);
+  border-color: var(--border-medium);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.telemetry-node:active {
+  transform: translateY(0);
+}
