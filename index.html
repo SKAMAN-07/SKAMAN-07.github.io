@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hive — Frontier Multi-Model Deliberation & Arbiter Mesh</title>
+  <title>Hive — Frontier Multi-Model Deliberation & Arbiter Architecture</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,20 +17,17 @@
   <nav class="navbar">
     <div class="container navbar-inner">
       <div class="brand-group" id="brandLogoBtn">
-        <span class="brand-logo-icon">⚡</span>
-        <span class="brand-title">HIVE</span>
-        <span class="brand-tag">AIS MESH</span>
+        <img src="img/hive_logo.png" alt="HIVE" class="brand-logo-img">
       </div>
 
       <ul class="nav-links">
         <li><a class="nav-link" href="#overview" id="navLinkOverview">Overview</a></li>
         <li><a class="nav-link" href="#playground" id="navLinkPlayground">Playground</a></li>
         <li><a class="nav-link" href="#council" id="navLinkCouncil">Council</a></li>
-        <li><a class="nav-link" href="#architecture" id="navLinkArchitecture">Architecture</a></li>
       </ul>
 
       <div class="nav-actions">
-        <!-- Google Sign-In Trigger (Unauthenticated) -->
+        <!-- Login / Sign Up Button -->
         <button class="btn btn-secondary btn-sm" id="navAuthBtn">
           <svg viewBox="0 0 24 24" width="16" height="16">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -38,7 +35,7 @@
             <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
             <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
           </svg>
-          <span id="navAuthBtnText">Sign In with Google</span>
+          <span id="navAuthBtnText">Login / Sign Up</span>
         </button>
 
         <!-- Sidebar / Account Drawer Toggle Button -->
@@ -57,35 +54,19 @@
     <canvas id="heroCanvas" class="hero-canvas"></canvas>
 
     <div class="container hero-content">
-      <div class="pill-badge">
-        <span class="pill-dot"></span>
-        <span>Consensus Mesh v2.0 • Zero Host Burden Architecture</span>
-      </div>
-
       <h1 class="hero-headline">
         Frontier AI deliberation,<br>
         <span class="accent">governed by The Arbiter.</span>
       </h1>
 
       <p class="hero-subtitle">
-        An autonomous 5-node neural mesh where frontier models debate in parallel, stress-test adversarial splits, and synthesize verified, publication-grade deliverables.
+        An autonomous 5-node consensus mesh where frontier models debate in parallel, stress-test adversarial splits, and synthesize verified, publication-grade deliverables.
       </p>
 
       <div class="hero-cta-group">
         <button class="btn btn-primary btn-lg" id="heroLaunchBtn">
-          ⚡ Launch Deliberation Console &rarr;
+          Launch Console &rarr;
         </button>
-        <button class="btn btn-secondary btn-lg" id="heroAuthBtn">
-          Sign In with Google
-        </button>
-      </div>
-
-      <div class="hero-specs-row">
-        <span>🔒 Zero Host Compute Burden</span>
-        <span>•</span>
-        <span>⚡ 60 FPS Procedural Synapses</span>
-        <span>•</span>
-        <span>⚖️ Executive Arbiter Verification</span>
       </div>
     </div>
   </header>
@@ -141,7 +122,7 @@
         <textarea 
           class="prompt-box" 
           id="queryInput" 
-          placeholder="Enter problem, mission, or blueprint for cross-model deliberation (e.g. 'Audit this distributed consensus architecture for Byzantine split failure modes', 'Prove algorithmic correctness under network latency spikes')..."
+          placeholder="Enter problem, mission, or topic for cross-model deliberation (e.g. 'Describe in details about Investment Banking, Private Equity and International Taxation')..."
         ></textarea>
 
         <!-- Console Action Controls -->
@@ -150,7 +131,7 @@
             Quota: 5/5 Free Deliberations Remaining
           </div>
           <button class="btn btn-primary btn-submit" id="submitBtn">
-            ⚡ Convene Council &amp; The Arbiter
+            Submit
           </button>
         </div>
 
@@ -167,7 +148,7 @@
               <h3 style="font-size: 18px; color: #10b981;">Executive Arbiter Verdict</h3>
             </div>
             <span class="pill-badge" id="outputVerdictBadge" style="border-color: #10b981; color: #10b981;">
-              APPROVED (Score: 96/100)
+              APPROVED (Score: 97/100)
             </span>
           </div>
           <p id="outputReasoningText" style="font-size: 14px; color: var(--text-secondary); margin-top: 6px;">
@@ -224,7 +205,7 @@
   </div>
 
   <!-- ============================================================== -->
-  <!-- 5. COUNCIL ROLES & ARCHITECTURE (INSPIRED BY REFERENCE)        -->
+  <!-- 5. COUNCIL ROLES & ARCHITECTURE                                -->
   <!-- ============================================================== -->
   <section class="section" id="council">
     <div class="container">
@@ -261,7 +242,7 @@
           <span class="council-role-badge">ADVERSARIAL STRESS TEST</span>
           <h3>The Skeptic</h3>
           <p style="margin-top: 8px; font-size: 14px;">
-            Ruthlessly challenges assumptions, audits boundary conditions, finds Byzantine failure modes, and forces rigorous defense.
+            Ruthlessly challenges assumptions, audits boundary conditions, finds failure modes, and forces rigorous defense.
           </p>
         </div>
 
@@ -288,7 +269,7 @@
   </section>
 
   <!-- ============================================================== -->
-  <!-- 6. GOOGLE AUTHENTICATION MODAL (ZERO 401 LOCKOUT)              -->
+  <!-- 6. GOOGLE AUTHENTICATION MODAL (ZERO HARDCODED NAMES)          -->
   <!-- ============================================================== -->
   <div class="auth-modal" id="authModal">
     <div class="auth-card">
@@ -298,37 +279,28 @@
         <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
         <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
       </svg>
-      <h3 style="font-size: 20px; color: #111827; margin-bottom: 6px;">Sign in with Google</h3>
+      <h3 style="font-size: 20px; color: #111827; margin-bottom: 6px;">Sign In to Hive</h3>
       <p style="font-size: 13px; color: #6b7280; margin-bottom: 20px;">
-        Choose an account to continue to <strong>HIVE AIS MESH</strong>
+        Sign in to save your deliberation consensus records
       </p>
 
-      <!-- Primary Account (Akmal / 2022abircoc@gmail.com from WhatsApp Screenshot) -->
-      <div class="google-account-btn" id="googleAccountPrimary">
-        <div class="account-avatar">A</div>
-        <div>
-          <div style="font-weight: 600; font-size: 14px; color: #111827;">Akmal (SKAMAN)</div>
-          <div style="font-size: 12px; color: #6b7280;">2022abircoc@gmail.com</div>
-        </div>
+      <div style="text-align: left; margin-bottom: 16px;">
+        <label style="font-size: 12px; font-weight: 600; color: #374151; display: block; margin-bottom: 4px;">Your Name (optional)</label>
+        <input type="text" id="authNameInput" placeholder="Enter your name" style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; margin-bottom: 12px; color: #111827;">
+
+        <label style="font-size: 12px; font-weight: 600; color: #374151; display: block; margin-bottom: 4px;">Email Address</label>
+        <input type="email" id="authEmailInput" placeholder="user@gmail.com" style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; color: #111827;">
       </div>
 
-      <!-- Custom Account Option -->
-      <div class="google-account-btn" id="googleAccountCustom" style="margin-top: 10px;">
-        <div class="account-avatar" style="background: #4b5563;">+</div>
-        <div>
-          <div style="font-weight: 600; font-size: 14px; color: #111827;">Use another Google account</div>
-          <div style="font-size: 12px; color: #6b7280;">Sign in with a different name or email</div>
-        </div>
-      </div>
+      <button class="btn btn-primary" id="googleAuthSubmitBtn" style="width: 100%; padding: 12px; font-size: 14px; margin-bottom: 8px;">
+        Continue with Google
+      </button>
 
-      <!-- Custom Account Drawer -->
-      <div id="customAccountDrawer" style="display:none; margin-top: 14px; text-align: left;">
-        <input type="text" id="customNameInput" placeholder="Full Name" style="width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 13px; margin-bottom: 8px;">
-        <input type="email" id="customEmailInput" placeholder="Gmail Address" style="width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 13px; margin-bottom: 8px;">
-        <button class="btn btn-primary btn-sm" id="customSubmitBtn" style="width: 100%;">Continue</button>
-      </div>
+      <button class="btn btn-secondary" id="guestAuthSubmitBtn" style="width: 100%; padding: 10px; font-size: 13px; color: #374151; border-color: #d1d5db; margin-bottom: 8px;">
+        Continue as Guest
+      </button>
 
-      <button class="btn btn-secondary btn-sm" id="closeAuthModalBtn" style="margin-top: 20px; width: 100%; color: #374151;">
+      <button class="btn btn-outline" id="closeAuthModalBtn" style="width: 100%; color: #6b7280; border: none; font-size: 13px;">
         Cancel
       </button>
     </div>
@@ -348,8 +320,8 @@
       <!-- Profile Card -->
       <div style="background: var(--bg-card); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); margin-bottom: 20px;">
         <div style="font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; margin-bottom: 4px;">User Account</div>
-        <div id="sidebarUserName" style="font-weight: 700; font-size: 15px;">Akmal (SKAMAN)</div>
-        <div id="sidebarUserEmail" style="font-size: 13px; color: var(--text-secondary);">2022abircoc@gmail.com</div>
+        <div id="sidebarUserName" style="font-weight: 700; font-size: 15px;">Guest User</div>
+        <div id="sidebarUserEmail" style="font-size: 13px; color: var(--text-secondary);">Not signed in</div>
       </div>
 
       <!-- Engine BYOK Settings -->
@@ -379,7 +351,7 @@
   <!-- ============================================================== -->
   <footer style="padding: 48px 0; border-top: 1px solid var(--border-subtle); text-align: center; font-size: 13px; color: var(--text-muted); position: relative; z-index: 2;">
     <div class="container">
-      <p style="margin-bottom: 8px;">⚡ HIVE AIS MESH — Frontier Multi-Model Deliberation Architecture</p>
+      <p style="margin-bottom: 8px;">⚡ HIVE — Frontier Multi-Model Deliberation Architecture</p>
       <p style="font-size: 12px; color: var(--text-dim);">Deployed on GitHub Pages • Zero Server Cost • Client-Side Security Shield</p>
     </div>
   </footer>

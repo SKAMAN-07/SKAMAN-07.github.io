@@ -241,26 +241,14 @@ p {
   cursor: pointer;
 }
 
-.brand-logo-icon {
-  font-size: 22px;
-  color: var(--coral-primary);
-}
-
-.brand-title {
-  font-size: 18px;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  color: var(--text-primary);
-}
-
-.brand-tag {
-  font-size: 11px;
-  font-family: "JetBrains Mono", monospace;
-  color: var(--coral-primary);
-  background: rgba(218, 119, 86, 0.12);
-  padding: 2px 8px;
-  border-radius: var(--radius-xs);
-  border: 1px solid rgba(218, 119, 86, 0.3);
+.brand-logo-img {
+  height: 32px;
+  width: auto;
+  max-width: 140px;
+  mix-blend-mode: screen;
+  filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.6));
+  display: inline-block;
+  vertical-align: middle;
 }
 
 .nav-links {

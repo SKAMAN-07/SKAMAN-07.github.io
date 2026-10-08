@@ -138,9 +138,9 @@ class HiveSecurityShield {
    * Resolves WhatsApp Error 401: invalid_client by providing deterministic,
    * safe, and genuine client-side Google Account verification.
    */
-  loginWithGoogleAccount(name = "Akmal (SKAMAN)", email = "2022abircoc@gmail.com", picture = "") {
-    const cleanName = (name || "Akmal (SKAMAN)").trim();
-    const cleanEmail = (email || "2022abircoc@gmail.com").trim();
+  loginWithGoogleAccount(name = "", email = "", picture = "") {
+    const cleanEmail = (email && email.trim()) || "user@gmail.com";
+    const cleanName = (name && name.trim()) || cleanEmail.split('@')[0] || "User";
 
     this.currentUser = {
       name: cleanName,

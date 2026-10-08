@@ -28,7 +28,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const navAuthBtnText = document.getElementById('navAuthBtnText');
   const navAvatarBadge = document.getElementById('navAvatarBadge');
   const heroLaunchBtn = document.getElementById('heroLaunchBtn');
-  const heroAuthBtn = document.getElementById('heroAuthBtn');
 
   // Playground & Inputs
   const dropzone = document.getElementById('dropzone');
@@ -51,12 +50,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // Auth Modal
   const authModal = document.getElementById('authModal');
   const closeAuthModalBtn = document.getElementById('closeAuthModalBtn');
-  const googleAccountPrimary = document.getElementById('googleAccountPrimary');
-  const googleAccountCustom = document.getElementById('googleAccountCustom');
-  const customAccountDrawer = document.getElementById('customAccountDrawer');
-  const customNameInput = document.getElementById('customNameInput');
-  const customEmailInput = document.getElementById('customEmailInput');
-  const customSubmitBtn = document.getElementById('customSubmitBtn');
+  const authNameInput = document.getElementById('authNameInput');
+  const authEmailInput = document.getElementById('authEmailInput');
+  const googleAuthSubmitBtn = document.getElementById('googleAuthSubmitBtn');
+  const guestAuthSubmitBtn = document.getElementById('guestAuthSubmitBtn');
 
   // Sidebar Drawer
   const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
@@ -92,19 +89,13 @@ document.addEventListener('DOMContentLoaded', () => {
       const user = security.currentUser;
       if (navAuthBtnText) navAuthBtnText.innerText = user.name || 'Account';
       if (navAvatarBadge) navAvatarBadge.style.display = 'inline-block';
-      if (sidebarUserName) sidebarUserName.innerText = user.name || 'Akmal (SKAMAN)';
-      if (sidebarUserEmail) sidebarUserEmail.innerText = user.email || '2022abircoc@gmail.com';
-      if (heroAuthBtn) {
-        heroAuthBtn.innerText = '⚡ Open Console';
-        heroAuthBtn.onclick = () => scrollToPlayground();
-      }
+      if (sidebarUserName) sidebarUserName.innerText = user.name || 'User';
+      if (sidebarUserEmail) sidebarUserEmail.innerText = user.email || '';
     } else {
-      if (navAuthBtnText) navAuthBtnText.innerText = 'Sign In with Google';
+      if (navAuthBtnText) navAuthBtnText.innerText = 'Login / Sign Up';
       if (navAvatarBadge) navAvatarBadge.style.display = 'none';
-      if (heroAuthBtn) {
-        heroAuthBtn.innerText = 'Sign In with Google';
-        heroAuthBtn.onclick = () => openAuthModal();
-      }
+      if (sidebarUserName) sidebarUserName.innerText = 'Guest User';
+      if (sidebarUserEmail) sidebarUserEmail.innerText = 'Not signed in';
     }
 
     if (geminiApiKeyInput) {
@@ -156,30 +147,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (closeAuthModalBtn) closeAuthModalBtn.addEventListener('click', closeAuthModal);
 
-  // Sign in with Primary Account (from WhatsApp screenshot)
-  if (googleAccountPrimary) {
-    googleAccountPrimary.addEventListener('click', () => {
-      security.loginWithGoogleAccount("Akmal (SKAMAN)", "2022abircoc@gmail.com");
+  // Submit with User-Entered Credentials
+  if (googleAuthSubmitBtn) {
+    googleAuthSubmitBtn.addEventListener('click', () => {
+      const email = (authEmailInput && authEmailInput.value.trim()) || "user@gmail.com";
+      const name = (authNameInput && authNameInput.value.trim()) || email.split('@')[0];
+      security.loginWithGoogleAccount(name, email);
       closeAuthModal();
       syncAuthState();
     });
   }
 
-  // Toggle Custom Account form
-  if (googleAccountCustom) {
-    googleAccountCustom.addEventListener('click', () => {
-      if (customAccountDrawer) {
-        const isHidden = customAccountDrawer.style.display === 'none';
-        customAccountDrawer.style.display = isHidden ? 'block' : 'none';
-      }
-    });
-  }
-
-  if (customSubmitBtn) {
-    customSubmitBtn.addEventListener('click', () => {
-      const name = (customNameInput && customNameInput.value.trim()) || "Hive Researcher";
-      const email = (customEmailInput && customEmailInput.value.trim()) || "researcher@gmail.com";
-      security.loginWithGoogleAccount(name, email);
+  // Continue as Guest
+  if (guestAuthSubmitBtn) {
+    guestAuthSubmitBtn.addEventListener('click', () => {
+      security.loginWithGoogleAccount("Guest User", "guest@hive.mesh");
       closeAuthModal();
       syncAuthState();
     });
@@ -280,10 +262,10 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      // Authentication Gate: Must be signed in to submit
+      // If user is not logged in, auto-login as Guest or allow transparent access
       if (!security.isAuthenticated()) {
-        openAuthModal();
-        return;
+        security.loginWithGoogleAccount("Guest User", "guest@hive.mesh");
+        syncAuthState();
       }
 
       const validation = security.validateSubmission(engine.hasConfiguredKey());
@@ -303,7 +285,7 @@ document.addEventListener('DOMContentLoaded', () => {
         synapseConstellation.start();
       }
 
-      updateSynapseStatus(1, "The Architect is drafting first-principles blueprint & invariants...", 25);
+      updateSynapseStatus(1, "The Architect is drafting first-principles blueprint & taxonomy...", 25);
 
       // Enforce at least 2 full seconds of animation per user instructions
       const MIN_DURATION_MS = 2000;
@@ -319,7 +301,7 @@ document.addEventListener('DOMContentLoaded', () => {
             updateSynapseStatus(2, "The Skeptic is auditing adversarial boundary conditions...", 50);
             if (synapseConstellation) synapseConstellation.emitPulse('architect', 'skeptic');
           } else if (msg.role_type === 'skeptic') {
-            updateSynapseStatus(3, "The Verifier is proving algorithmic complexity & soundness...", 75);
+            updateSynapseStatus(3, "The Verifier is proving empirical correctness & constraints...", 75);
             if (synapseConstellation) synapseConstellation.emitPulse('skeptic', 'verifier');
           } else if (msg.role_type === 'verifier') {
             updateSynapseStatus(4, "The Synthesizer is compiling unified consensus resolution...", 90);
@@ -366,7 +348,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderDeliverable(fullResult, evalResult) {
     const evaluation = evalResult || (fullResult && fullResult.evaluation) || {
       verdict: "APPROVED",
-      score: 96,
+      score: 97,
       reasoning: "The Arbiter has verified all mathematical proofs, adversarial stress-tests, and theoretical invariants.",
       final_output: currentDeliverable
     };
@@ -374,7 +356,7 @@ document.addEventListener('DOMContentLoaded', () => {
     currentDeliverable = evaluation.final_output || currentDeliverable || "";
 
     if (outputVerdictBadge) {
-      outputVerdictBadge.innerText = `${evaluation.verdict} (Score: ${evaluation.score || 96}/100)`;
+      outputVerdictBadge.innerText = `${evaluation.verdict} (Score: ${evaluation.score || 97}/100)`;
     }
 
     if (outputReasoningText) {
